@@ -15,5 +15,9 @@ p, span {
 }
 
 p {
-  margin: 12px 0 !important;
+  margin: 32px 0 !important;
+}
+
+.rs-timeline-item {
+  font-size: 16px;
 }

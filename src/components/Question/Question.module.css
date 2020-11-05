@@ -1,0 +1,20 @@
+.VerticalCenter {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+}
+
+.Container {
+  display: grid; 
+  grid-template-columns: 1fr 300px;
+  column-gap: 12px;
+
+  padding: 10px 8px;
+  border-bottom: 1px dashed #eeeeee;
+}
+
+.Container:hover {
+  /* background: rgba(52, 152, 255, 0.12); */
+  /* border-bottom-color: rgb(52, 152, 255); */
+  /* border-bottom-color: rgb(52, 152, 255); */
+}
