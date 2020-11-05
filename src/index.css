@@ -4,9 +4,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #fafafa !important;
-  padding: 8px;
+  padding: 0;
   color: #575757 !important;
   box-sizing: border-box !important;
+  
 }
 
 p, span {
