@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline } from 'rsuite';
+import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline, Loader } from 'rsuite';
 import IconReliancera from '../../assets/reliancera-icon.png';
 import { carriers, data, diseases } from '../../data';
 import Annotation from '../Annotation/Annotation';
@@ -7,7 +7,9 @@ import Card from '../Card/Card';
 import { QuestionBool, QuestionPicker, QuestionStr, QuestionTwoFields } from '../Question/Question';
 import Referrals from '../Referrals/Referrals';
 import styles from './Sheet.module.css';
-
+import fetch from 'isomorphic-unfetch'
+import urljoin from 'url-join'
+import { baseUrl } from '../../utils'
 
 const Strong = ({ text, customStyles }) => {
 return <span style={{ fontWeight: 500, ...customStyles }}>{text}</span>
@@ -61,11 +63,14 @@ export default class Sheet extends React.Component {
       carriers,
       firstName: '',
       lastName: '',
+      isLoading: true,
+      recordID: null,
+      birthDate: '',
     }
 
   }
 
-  componentDidMount() {
+  async componentDidMount() {
 
     const winPathUrl    = window.location.href;
     const containParams = winPathUrl.includes('?');
@@ -88,10 +93,78 @@ export default class Sheet extends React.Component {
 
       console.log(recordID)
 
+      await this.setState({ recordID })
+      await this.fetchRecordData()
+      
+    } else {
+      this.setState({ isLoading: false })
     }
   }
 
+  fetchRecordData = async () => {
+
+    try {
+
+      const url = urljoin(baseUrl, `${this.state.recordID}`);
+      console.log(url)
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+
+      const request = await fetch(url, { headers, method: 'GET'});
+      const json = await request.json();
+
+      if (request.status === 200) {
+
+        this.setState({
+          state: json.state,
+          zip: json.zip,
+          phone: json.phone,
+          firstName: json.firstName,
+          lastName: json.lastName,
+          birthDate: json.birthDate,
+          city: json.city,
+          address: json.address,
+          email: json.email,
+          isLoading: false,
+          fullName: `${json.firstName} ${json.lastName}`
+        })
+
+      } else {
+        this.setState({
+          isLoading: false,
+          recordID: null,
+        })
+      }
+
+    } catch (error) {
+      console.log(error);
+      this.setState({
+        isLoading: false,
+        recordID: null,
+      })
+    }
+
+  }
+
   render() {
+
+    if (this.state.isLoading) {
+      return (
+        <div>
+          <Loader style={{ borderColor: 'red' }} backdrop speed="fast" vertical content="loading..." center size="md" />
+        </div>
+      )
+    }
+
+    if (!this.state.isLoading && !this.state.recordID) {
+      return (
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+          <h3 style={{ fontWeight: 'bold' }}>Invalid Record</h3>
+        </div>
+      )
+    }
 
     const { two, inbound, peg }  = data;
     const clientName = 'Carlos Huit';
@@ -105,12 +178,14 @@ export default class Sheet extends React.Component {
     return (
       <div style={{ position: 'relative' }}>
         <div className={styles.FloatContainer}>
-          <div style={{ display:'flex', flexWrap: 'wrap' }}>
+          <div style={{ display:'flex', flexWrap: 'wrap', maxWidth: '1280px', margin: '0 auto', justifyContent:'center' }}>
 
 
 
             <CustomInput field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
             <CustomInput field="lastName" label="First Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
+            <CustomInput width={150} field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
+            <CustomInput width={250} field="email" label="Email" onChange={this.updateStrAnswer} value={this.state.email} />
             <CustomInput field="phone" label="Phone" onChange={this.updateStrAnswer} value={this.state.phone} />
             <CustomInput width={100} field="state" label="State" onChange={this.updateStrAnswer} value={this.state.state} />
             <CustomInput width={100} field="zip" label="Zip" onChange={this.updateStrAnswer} value={this.state.zip} />
@@ -128,7 +203,7 @@ export default class Sheet extends React.Component {
           <div className={styles.Container}>
 
             <div className={styles.Header}>
-              <img width="300" src={IconReliancera} alt="icon"/>
+              <img width="300" src="https://reliancera.com/wp-content/uploads/2020/10/reliancerapng.png" alt="icon"/>
               <h3 className={styles.ScriptTitle}>Final Expense Script</h3>
             </div>
       
