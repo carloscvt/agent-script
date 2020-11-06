@@ -37,9 +37,27 @@ export const diseases = [
 ];
 
 export const carriers = [
-  { value: 1, url: 'https://web.apptical.com/LiveApp/Login/LogOn', label: 'Prosperity', address: 'SBLI USA Life Insurance Company, Inc.100 W. 33rd Street, Suite 1007New York, NY 10001-2914 ' },
-  { value: 2, url: '', label: 'Aetna', address: '151 Farmington Ave, Hartford CT, 06156' },
-  { value: 3, url: 'https://gwicquote.myenroller.com/MobileQuoteDemographics.aspx', label: 'GWIC', address: '3434 Washington Blvd, Ogden, UT 84401' },
+  {
+    value: 1,
+    url: 'https://web.apptical.com/LiveApp/Login/LogOn',
+    label: 'Prosperity',
+    address: 'SBLI USA Life Insurance Company, Inc.100 W. 33rd Street, Suite 1007New York, NY 10001-2914 ',
+    img: 'https://reliancera.com/wp-content/uploads/2020/10/prosperity-1.png'
+  },
+  {
+    value: 2,
+    url: 'https://www.aetnaseniorproducts.com/ssi/login.fcc?TYPE=33554433&REALMOID=06-b6795d4d-3004-4588-a799-63a4db15a01c&GUID=&SMAUTHREASON=0&METHOD=GET&SMAGENTNAME=-SM-s7pFJAUCnH5Qp3pzu1lx8MibbZnWT%2b01G%2f6iCkHVxMsS0hd%2fsbmjhWe16MOGqvFRrS17O3IrRUBJqyBYHEvE5IyHDS9KZnck&TARGET=-SM-HTTPS%3a%2f%2fwww%2eaetnaseniorproducts%2ecom%2fssi%2fsecure%2fagentSecure%2fmyCompass%2ehtml', 
+    label: 'Aetna',
+    address: '151 Farmington Ave, Hartford CT, 06156',
+    img: 'https://reliancera.com/wp-content/uploads/2020/10/aetna-1.png',
+  },
+  {
+    value: 3,
+    url: 'https://gwicquote.myenroller.com/MobileQuoteDemographics.aspx',
+    label: 'GWIC',
+    address: '3434 Washington Blvd, Ogden, UT 84401',
+    img: 'https://reliancera.com/wp-content/uploads/2020/10/greatwestern-1.png',
+  },
 ]
 
 export const data = {

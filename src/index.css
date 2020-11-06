@@ -7,7 +7,7 @@ body {
   padding: 0;
   color: #575757 !important;
   box-sizing: border-box !important;
-  
+  overflow-x: hidden !important;  
 }
 
 p, span {
@@ -21,3 +21,10 @@ p {
 .rs-timeline-item {
   font-size: 16px;
 }
+
+.rs-input {
+  color: #1675e0 !important;
+  font-weight: 500 !important;
+}
+
+
