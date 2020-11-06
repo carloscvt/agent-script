@@ -40,7 +40,7 @@ export const carriers = [
   {
     value: 1,
     url: 'https://web.apptical.com/LiveApp/Login/LogOn',
-    label: 'Prosperity',
+    label: 'Prosperity Life Insurance Company',
     address: 'SBLI USA Life Insurance Company, Inc.100 W. 33rd Street, Suite 1007New York, NY 10001-2914 ',
     img: 'https://reliancera.com/wp-content/uploads/2020/10/prosperity-1.png'
   },
@@ -54,7 +54,7 @@ export const carriers = [
   {
     value: 3,
     url: 'https://gwicquote.myenroller.com/MobileQuoteDemographics.aspx',
-    label: 'GWIC',
+    label: 'Great Western Insurance Company',
     address: '3434 Washington Blvd, Ogden, UT 84401',
     img: 'https://reliancera.com/wp-content/uploads/2020/10/greatwestern-1.png',
   },
@@ -83,3 +83,9 @@ export const data = {
 }
 
 
+export const laborStatusOptions = [
+  { label: 'Employed',                   value: 1 },
+  { label: 'Retired',                    value: 2 },
+  { label: 'Social security disability', value: 3 },
+  { label: 'Unemployed',                 value: 4 },
+]

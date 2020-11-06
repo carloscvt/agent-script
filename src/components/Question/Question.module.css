@@ -18,3 +18,17 @@
   /* border-bottom-color: rgb(52, 152, 255); */
   /* border-bottom-color: rgb(52, 152, 255); */
 }
+
+.ContainerVertical {
+  display: grid;
+  grid-template-rows: 20px 36px;
+  margin: 4px 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.Center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

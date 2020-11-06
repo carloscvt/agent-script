@@ -72,22 +72,33 @@
 }
 
 .FloatContainer {
-  background: white; height: 200px; box-shadow: 0 4px 4px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.06);
+  background: white; height: 248px; box-shadow: 0 4px 4px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.06);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 2;
   padding: 20px 24px;
 }
 
 .Content {
   overflow: scroll;
-  top: 200px;
+  top: 248px;
   left: 0;
   right: 0;
   bottom: 0;
   position: fixed;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.ContainerFullName {
+  display: flex;
+  border-bottom: 1px dashed #eeeeee;
+  padding-bottom: 6px;
+  display: grid;
+  grid-template-columns: max-content 200px 200px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-right: 12px;
 }

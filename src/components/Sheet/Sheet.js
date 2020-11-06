@@ -1,7 +1,7 @@
 import React from 'react';
-import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline, Loader } from 'rsuite';
+import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline, Loader, Button, CheckboxGroup, Checkbox } from 'rsuite';
 import IconReliancera from '../../assets/reliancera-icon.png';
-import { carriers, data, diseases } from '../../data';
+import { carriers, data, diseases, laborStatusOptions } from '../../data';
 import Annotation from '../Annotation/Annotation';
 import Card from '../Card/Card';
 import { QuestionBool, QuestionPicker, QuestionStr, QuestionTwoFields } from '../Question/Question';
@@ -12,7 +12,7 @@ import urljoin from 'url-join'
 import { baseUrl } from '../../utils'
 
 const Strong = ({ text, customStyles }) => {
-return <span style={{ fontWeight: 500, ...customStyles }}>{text}</span>
+return <span style={{  color: '#3498ff', fontSize: '20px', fontWeight: 500, ...customStyles }}>{text}</span>
 }
 
 const CustomInput = ({  width = 200, label, value, field, onChange }) => (
@@ -66,6 +66,8 @@ export default class Sheet extends React.Component {
       isLoading: true,
       recordID: null,
       birthDate: '',
+      laborStatusOptions,
+      phone: ''
     }
 
   }
@@ -77,7 +79,6 @@ export default class Sheet extends React.Component {
     let recordID     = null;
 
     if ( containParams ) {
-
 
       const params  = winPathUrl.substr(winPathUrl.indexOf('?')+1);
       const param = params.split('&');
@@ -167,9 +168,9 @@ export default class Sheet extends React.Component {
     }
 
     const { two, inbound, peg }  = data;
-    const clientName = 'Carlos Huit';
-    const beneficiary = 'Carlos Huit';
-    const clientState = 'CA';
+    const clientName = this.state.firstName;
+    const beneficiary = this.state.beneficiary;
+    const clientState = this.state.state;
   
     const findCarrier = this.state.carriers.find(e => e.value === this.state.selectedCarrier);
     const selectedCarrier = findCarrier ? findCarrier : {};
@@ -183,16 +184,44 @@ export default class Sheet extends React.Component {
 
 
             <CustomInput field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
-            <CustomInput field="lastName" label="First Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
-            <CustomInput width={150} field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
-            <CustomInput width={250} field="email" label="Email" onChange={this.updateStrAnswer} value={this.state.email} />
+            <CustomInput field="lastName" label="Last Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
+            <CustomInput field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
+            <CustomInput field="email" label="Email" onChange={this.updateStrAnswer} value={this.state.email} />
             <CustomInput field="phone" label="Phone" onChange={this.updateStrAnswer} value={this.state.phone} />
-            <CustomInput width={100} field="state" label="State" onChange={this.updateStrAnswer} value={this.state.state} />
-            <CustomInput width={100} field="zip" label="Zip" onChange={this.updateStrAnswer} value={this.state.zip} />
-            <CustomInput width={300} field="address" label="Address" onChange={this.updateStrAnswer} value={this.state.address} />
-            <CustomInput width={100} field="height" label="Height" onChange={this.updateStrAnswer} value={this.state.height} />
-            <CustomInput width={100} field="weight" label="Weight" onChange={this.updateStrAnswer} value={this.state.weight} />
+            <CustomInput field="state" label="State" onChange={this.updateStrAnswer} value={this.state.state} />
+            <CustomInput field="zip" label="Zip" onChange={this.updateStrAnswer} value={this.state.zip} />
+            <CustomInput field="address" label="Address" onChange={this.updateStrAnswer} value={this.state.address} />
+            <CustomInput field="height" label="Height" onChange={this.updateStrAnswer} value={this.state.height} />
 
+            <CustomInput field="weight" label="Weight" onChange={this.updateStrAnswer} value={this.state.weight} />
+            <CustomInput field="beneficiary" label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
+            <CustomInput field="faceAmmount" label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
+
+            <QuestionPicker
+              vertical
+              text="Labor Status:"
+              opts={this.state.laborStatusOptions}
+              value={this.state.laborStatus}
+              field="laborStatus"
+              onChange={this.updateStrAnswer}
+              />
+
+            <QuestionBool vertical centerToggle
+              text="Currently have Life Insurance:"
+              value={this.state.haveLifeInsurance}
+              field="haveLifeInsurance"
+              onChange={this.updateStrAnswer}
+              />
+            <QuestionBool vertical centerToggle
+              text="Smoker:"
+              value={this.state.smoked}
+              field="smoked"
+              onChange={this.updateStrAnswer}
+              />
+
+            <div style={{ display: 'flex', alignItems: 'flex-end', width: '200px', justifyContent: 'center' }}>
+              <Button color="blue" style={{ fontWeight: 500, width: '148px' }} onClick={this.submitData}>Submit</Button>
+            </div>
  
 
           </div>
@@ -324,12 +353,7 @@ export default class Sheet extends React.Component {
 
                     <QuestionPicker
                       text="Are you currently employed, retired, or on social security disability?"
-                      opts={[
-                        { label: 'Employed',                   value: 1 },
-                        { label: 'Retired',                    value: 2 },
-                        { label: 'Social security disability', value: 3 },
-                        { label: 'Unemployed',                 value: 4 },
-                      ]}
+                      opts={this.state.laborStatusOptions}
                       value={this.state.laborStatus}
                       field="laborStatus"
                       onChange={this.updateStrAnswer}
@@ -352,7 +376,7 @@ export default class Sheet extends React.Component {
                         />
                     </div>
                     
-                    <div style={{ paddingLeft: '72px' }}>
+                    {/* <div style={{ paddingLeft: '72px' }}>
                       <Annotation customStyles={{ textAlign: 'left', marginTop: '36px', paddingLeft: '10px'}} text="If by mailbox:"/>
                       <div  style={{ paddingLeft: '0px' }}>
                         <QuestionBool 
@@ -368,7 +392,7 @@ export default class Sheet extends React.Component {
                         text="If not STOP and thank the customer for their time."
                         />
 
-                    </div>
+                    </div> */}
       
       
                   </div>
@@ -406,17 +430,11 @@ export default class Sheet extends React.Component {
       
       
       
-      
-              <CheckPicker
-                placeholder="Select..."
-                searchable={true}
-                style={{ width: '100%' }}
-                menuStyle={{ paddingTop: '18px', paddingBottom: '18px' }}
-                data={diseases}
-                defaultValue={this.state.selectedDiseases}
-                value={this.state.selectedDiseases}
-                onChange={selectedDiseases =>  this.setState({ selectedDiseases }) }
-              />
+              <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+                {diseases.map(e => (
+                  <Checkbox checked={this.state.selectedDiseases.some(sd => sd === e.value)} value={e.value}>{e.label}</Checkbox>
+                ))}
+              </CheckboxGroup>
       
       
               <br/>
@@ -449,7 +467,7 @@ export default class Sheet extends React.Component {
                   onChange={this.updateStrAnswer}
                   />
       
-                <Annotation customStyles={{ marginTop: '32px' }} text={'If any question is answered “Yes”, Write policy through GWIC'} />
+
       
                 <QuestionBool
                   field="q1"
@@ -481,19 +499,20 @@ export default class Sheet extends React.Component {
                     centerToggle text={'c. had or been advised by a member of the medical profession to have Kidney Dialysis or Cirrhosis? '} />
                 </div>
       
-                <p style={{ paddingLeft: '8px' }}>{'4. Has the Proposed Insured ever:'}</p>
+                {/* <p style={{ paddingLeft: '8px' }}>{'4. Has the Proposed Insured ever:'}</p>
                 <div style={{ paddingLeft: '32px', paddingBottom: '38px' }}>
                   <QuestionBool
                     field="q4a"
                     value={this.state.q4a}
                     onChange={this.updateStrAnswer} 
                     centerToggle text={'a. been diagnosed with Acquired Immunodeficiency Syndrome (AIDS) or Aids-related Complex (ARC) by a medical professional; or Human Immuniodeficiency Virus (HIV)?'} />
-                </div>
+                </div> */}
 
-                <QuestionBool field="q5a" value={this.state.q5a} onChange={this.updateStrAnswer} centerToggle text={'5. Has the Proposed Insured ever been diagnosed or received treatment by a member of the medical profession for Alzheimer’s disease, dementia, Lou Gehrig’s/Amyotrophic Lateral Sclerosis (ALS).'} />
+                {/* <QuestionBool field="q5a" value={this.state.q5a} onChange={this.updateStrAnswer} centerToggle text={'5. Has the Proposed Insured ever been diagnosed or received treatment by a member of the medical profession for Alzheimer’s disease, dementia, Lou Gehrig’s/Amyotrophic Lateral Sclerosis (ALS).'} /> */}
                 <QuestionBool field="q6a" value={this.state.q6a} onChange={this.updateStrAnswer} centerToggle text={'6. Has the Proposed Insured ever been diagnosed by a member of the medical profession with more than one occurrence of the same or different type of cancer or is the Proposed Insured currently receiving treatment (including taking medication) for any form of cancer (excluding basal cell skin cancer)?'} />
                 <QuestionBool field="q7a" value={this.state.q7a} onChange={this.updateStrAnswer} centerToggle text={'7. Is the insurance applied for intended to replace or change any life insurance, long term care insurance or annuity contract in force with this or any other company?'} />
       
+                <Annotation customStyles={{ marginTop: '32px' }} text={'If any question above is answered, “yes,” write policy through Great Western Insurance Company'} />
                 <Annotation customStyles={{ marginTop: '40px', marginBottom: '0px' }} text={'[IF REPLACING A POLICY AND THEY QUALIFY USE AETNA]'} />
       
               </div>
@@ -504,7 +523,13 @@ export default class Sheet extends React.Component {
               <div style={{ padding: '0 20px' }}>
       
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr', marginBottom: '24px'}}>
-                  <QuestionStr field="fullName" value={this.state.fullName} onChange={this.updateStrAnswer} text="Your full name is:"/>
+                  <div className={styles.ContainerFullName}>
+                    <span>Your full name is:</span>
+                    {/* <QuestionStr field="fullName" value={this.state.fullName} onChange={this.updateStrAnswer} text="Your full name is:"/> */}
+                    <CustomInput field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
+                    <CustomInput field="lastName" label="Last Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
+                  </div>
+                  
                   <Divider style={{ height: '100%' }} vertical/>
                   <QuestionStr field="email" value={this.state.email} onChange={this.updateStrAnswer} text="Your email address is:"/>
                 </div>
@@ -697,68 +722,11 @@ export default class Sheet extends React.Component {
                 }
               </div>
 
+              <div className={styles.ContainerCarrierButtons}>
+                <IconButton onClick={() => { window.open('https://reliancera.com/agents', '_blank', 'width=960,height=500,toolbar=no') }} color="green" icon={<Icon icon="check-square-o"/>}>Checking / Savings Verification</IconButton>
+              </div>
 
 
-              <html lang="en">
-              <head>
-                  <title>BetterCheck Verification Form (sample)</title>
-                  <link rel="stylesheet" type="text/css" href="http://bettercheck.com/styles/bettercheck.css"/>
-              </head>
-              <body>
-
-              <form method="post" action="https://verify.bettercheck.com/bettercheck/weblink.php" name="weblink">
-                <input type="hidden" name="weblinkagentid" value="88850" />
-                <input type="hidden" name="weblinkid" value="CA91302" />
-                <input type="hidden" name="resultformat" value="xml" />
-                <input type="hidden" name="user1" value="userdefined1" />
-                <input type="hidden" name="user2" value="userdefined2" />
-
-                <table border="0" cellpadding="2" cellspacing="1" width="300">
-                  <tbody>
-                    <tr>
-                      <td>
-                        <font face="Verdana" color="#000000" size="1">Routing number:</font>
-                      </td>
-                      <td>
-                        <input type="text" name="routing" size="20" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <font face="Verdana" color="#000000" size="1">Account number:</font>
-                      </td>
-                      <td>
-                        <input type="text" name="acctnum" size="20"/>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <font face="Verdana" color="#000000" size="1">Amount:</font>
-                      </td>
-                      <td>
-                        <input type="text" name="amount" size="16"/>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <font face="Verdana" color="#000000" size="1">Check # (Optional):</font>
-                      </td>
-                      <td>
-                        <input type="text" name="checknum" size="16"/>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                <p>
-                  <input type="hidden" name="op" value="process"/>
-                  <input type="submit" name="submit" />
-                </p>
-
-              </form>
-
-              </body>
-              </html>
-      
               <p>
                 <span style={{color: '#f44336'}}>If you truly followed this process & they don’t buy after this and they’re still on the phone with you, they don’t trust you so ask politely.</span>
                 {' What’s really holding you back? I can text you a copy of my insurance license. Would that make you feel more comfortable?'}
@@ -853,6 +821,26 @@ export default class Sheet extends React.Component {
 
   }
 
+  submitData = () => {
+    console.log(this.state);
+    const { 
+      firstName, 
+      lastName, 
+      birthDate, 
+      email, 
+      phone, 
+      state, 
+      zip, 
+      address, 
+      height, 
+      weight, 
+      beneficiary, 
+      faceAmmount: faceAmount, 
+      laborStatus, 
+      haveLifeInsurance, 
+      smoked: smoker,
+    } = this.state;
+  }
 
   onDeleteReferral = (i) => {
 
@@ -887,9 +875,7 @@ export default class Sheet extends React.Component {
 
   updateStrAnswer = (value, field) => {
 
-    this.setState({
-      [field]: value
-    })
+    this.setState({ [field]: value })
 
   }
 
