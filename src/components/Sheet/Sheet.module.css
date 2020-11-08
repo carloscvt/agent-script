@@ -5,6 +5,7 @@
   padding-top: 24px;
   max-width: 1280px;
   margin: 0 auto;
+  overflow-x: auto;
 }
 
 
@@ -88,8 +89,10 @@
   right: 0;
   bottom: 0;
   position: fixed;
-  overflow-y: scroll;
+  overflow-y: hidden;
   overflow-x: hidden;
+  display: grid;
+  grid-template-columns: 260px 1fr;
 }
 
 .ContainerFullName {
@@ -101,4 +104,12 @@
   align-items: flex-end;
   justify-content: space-between;
   padding-right: 12px;
+}
+
+.QuotesContainerOpts {
+  width: max-content;
+  margin: 0px auto;
+  border: 1px solid #EEEEEE;
+  padding: 16px 24px;
+  border-radius: 6px;
 }

@@ -68,6 +68,7 @@ export const QuestionPicker = ({ text, opts, value, onChange, field, vertical = 
         <InputPicker 
           cleanable={false}
           size="md"
+          style={{ height: 'max-content' }}
           defaultValue={value}
           value={value}
           onSelect={(val, item) => onChange(val, field)}

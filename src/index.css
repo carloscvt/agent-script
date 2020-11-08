@@ -35,3 +35,69 @@ p {
 .rs-loader-spin::before {
   border: 3px solid rgba(33, 150, 243, 0.3) !important;
 }
+hr {
+  border: none !important;
+  margin: 0 !important;
+}
+
+.rs-panel-collapsible {
+  margin: 12px 0;
+  /* box-shadow: 0 2px 2px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.06); */
+}
+
+.rs-panel-heading {
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+
+.rs-panel-collapsible > .rs-panel-heading::before {
+  top: 12px !important;
+}
+
+.rs-panel-body p {
+  margin: 0px !important;
+  padding: 6px 22px !important;
+  line-height: 24px;
+}
+
+.rs-divider-vertical {
+  height: 60% !important;
+}
+
+.rs-sidenav .rs-nav-item .rs-nav-item-content {
+  padding: 8px 12px 8px 56px !important;
+}
+
+.rs-sidenav-inverse {
+  height: 100%;
+  /* padding: 24px 0; */
+  box-shadow: 6px 0 9px -5px rgb(0, 0, 0, 0.45);
+  background: linear-gradient(to bottom, #1680cc, #2196f3)
+} 
+
+.rs-sidenav-body {
+  background: rgba(0,0,0,.10);
+  padding: 24px 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 248px);
+}
+
+.rs-sidenav .rs-nav-item .rs-nav-item-content > .rs-icon {
+  top: 8px !important;
+}
+
+@media(min-width: 420px) {
+  .rs-sidenav-body::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: rgba(0,0,0,.10);
+  }
+  .rs-sidenav-body::-webkit-scrollbar {
+    width: 6px;
+    background-color: transparent;
+  }
+  .rs-sidenav-body::-webkit-scrollbar-thumb {
+    background-color: #ebebeb;
+    border-width: 1px;
+    border-radius: 24px;
+  }
+}
