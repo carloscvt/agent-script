@@ -81,6 +81,7 @@ hr {
   padding: 24px 0;
   overflow-y: auto;
   max-height: calc(100vh - 248px);
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.20), rgb(0 0 0 / 0.05));
 }
 
 .rs-sidenav .rs-nav-item .rs-nav-item-content > .rs-icon {
@@ -103,3 +104,14 @@ hr {
   }
 }
 
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

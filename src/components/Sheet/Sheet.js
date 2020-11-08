@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { isValidElement } from 'react';
 import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline, Loader, Button, CheckboxGroup, Checkbox, InputGroup, Panel, Sidenav, Nav } from 'rsuite';
 import IconReliancera from '../../assets/reliancera-icon.png';
 import { carriers, data, diseases, laborStatusOptions, initialDraftDates, benefitDates } from '../../data';
@@ -28,8 +28,12 @@ const CustomInput = ({  width = 200, label, value, field, onChange }) => (
 
 const Quote = ({ label, faceAmount, costPerMonth, onChange = (i, field, value) => {}, index }) => {
 
-  const toNumber   = val => isNaN(parseInt(val.replace(/,/g, ""))) ? '' : parseInt(val.replace(/,/g, ""));
-  const parseValue = val => val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  const toNumber   = val => {
+    return val;
+    // return isNaN(parseFloat(val.replace(/,/g, ""))) ? '' : parseFloat(val.replace(/,/g, ""));
+  }
+
+  const parseValue = val => val //(parseFloat(val)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
   
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '48px 160px 160px', alignItems: 'center', columnGap: '8px', justifyContent: 'center' }}>
@@ -37,28 +41,30 @@ const Quote = ({ label, faceAmount, costPerMonth, onChange = (i, field, value) =
       <InputGroup>
         <InputGroup.Addon>$</InputGroup.Addon>
         <Input
+          type="number"
           style={{ textAlign: 'right' }}
           onChange={(val) => onChange(index, 'faceAmount', toNumber(val))}
           size="sm"
           value={parseValue(faceAmount)}
           />
-        <InputGroup.Addon>.00</InputGroup.Addon>
+        {/* <InputGroup.Addon>.00</InputGroup.Addon> */}
       </InputGroup>
       <InputGroup>
         <InputGroup.Addon>$</InputGroup.Addon>
         <Input
+          type="number"
           style={{ textAlign: 'right' }}
           onChange={(val) => onChange(index, 'costPerMonth', toNumber(val))}
           size="sm"
           value={parseValue(costPerMonth)}
           />
-        <InputGroup.Addon>.00</InputGroup.Addon>
+        {/* <InputGroup.Addon>.00</InputGroup.Addon> */}
       </InputGroup>
     </div>
   )
 }
 
-const currencyFormat = (val) => `$${val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}.00`;
+const currencyFormat = (val) => <Currency symbol="$ " quantity={val} decimal="." locale="en" group="," />;
 
 export default class Sheet extends React.Component {
 
@@ -111,9 +117,9 @@ export default class Sheet extends React.Component {
       benefitDates,
 
       quotes: [
-        { option: '1st', faceAmount: 0, costPerMonth: 0 },
-        { option: '2nd', faceAmount: 0, costPerMonth: 0 },
-        { option: '3rd', faceAmount: 0, costPerMonth: 0 },
+        { value: 1, option: '1st', faceAmount: 0, costPerMonth: 0 },
+        { value: 2, option: '2nd', faceAmount: 0, costPerMonth: 0 },
+        { value: 3, option: '3rd', faceAmount: 0, costPerMonth: 0 },
       ],
       startCoverageAsSoonAsPossible: false,
       bankName: '',
@@ -139,7 +145,8 @@ export default class Sheet extends React.Component {
         { ref: 'vipsRef',                 value: 12, label: 'VIPS ' },
         { ref: 'submitRef',               value: 13, label: 'Submit ' },
 
-      ]
+      ],
+      selectedQuote: null,
     }
 
     this.openingRef = React.createRef();
@@ -347,9 +354,17 @@ export default class Sheet extends React.Component {
               />
 
             <div style={{ display: 'flex', alignItems: 'flex-end', width: '200px', justifyContent: 'center' }}>
-              <Button color="blue" style={{ fontWeight: 500, width: '148px' }} onClick={this.submitData}>Submit</Button>
+              <IconButton 
+                style={{ width: '160px', fontWeight:'500' }}
+                color="blue"
+                placement="right"
+                onClick={this.submitData}
+                icon={<Icon icon="send" />}
+                >
+                Submit
+              </IconButton> 
             </div>
- 
+
 
           </div>
         </div>
@@ -432,7 +447,7 @@ export default class Sheet extends React.Component {
                   <Annotation text="PEG"/>
                   <Annotation text={"Praise, Empathy, & Gratitude as You Build Rapport, Take Notes as You Listen"}/>
         
-                  <div>
+                  <div style={{ marginBottom: '24px' }}>
         
         
                     <p>{peg.content[0]}</p>
@@ -888,20 +903,28 @@ export default class Sheet extends React.Component {
 
         
                 <Annotation customStyles={{fontSize: '20px'}} text="CLOSE"/>
-        
-                <p>
-                  {'So tell me '}
-                  <Strong text={clientName}/>
-                  {', which option would you want '}
-                  <Strong text={beneficiary ? beneficiary : '<Beneficiary>'} />
-                  {' to receive when that inevitable day comes,'}  {' a check for '} 
-                  <Strong text={currencyFormat(this.state.quotes[0].faceAmount)} />
-                  {' a check for'}
-                  <Strong text={currencyFormat(this.state.quotes[1].faceAmount)} />
-                  {', or a check for '}
-                  <Strong text={currencyFormat(this.state.quotes[2].faceAmount)} />
-                  {'?'}
-                </p>
+
+                <QuestionPicker
+                  text={(
+                    <span>
+                      {'So tell me '}
+                      <Strong text={clientName}/>
+                      {', which option would you want '}
+                      <Strong text={beneficiary ? beneficiary : '<Beneficiary>'} />
+                      {' to receive when that inevitable day comes,'}  {' a check for '} 
+                      <Strong text={currencyFormat(this.state.quotes[0].faceAmount)} />
+                      {' a check for '}
+                      <Strong text={currencyFormat(this.state.quotes[1].faceAmount)} />
+                      {', or a check for '}
+                      <Strong text={currencyFormat(this.state.quotes[2].faceAmount)} />
+                      {'?'}
+                    </span>
+                  )}
+                  opts={this.state.quotes.map(e => ({ label: currencyFormat(e.faceAmount), value: e.value }))}
+                  value={this.state.selectedQuote}
+                  field="selectedQuote"
+                  onChange={this.updateStrAnswer}
+                  />
         
                 <p>
                   <span style={{color: '#f44336'}}>(IF Customer decides):</span>

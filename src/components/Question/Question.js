@@ -71,6 +71,7 @@ export const QuestionPicker = ({ text, opts, value, onChange, field, vertical = 
           style={{ height: 'max-content' }}
           defaultValue={value}
           value={value}
+          placement="bottom"
           onSelect={(val, item) => onChange(val, field)}
           placeholder="Select..."
           data={opts}/>
