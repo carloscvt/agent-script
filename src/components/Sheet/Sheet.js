@@ -124,23 +124,38 @@ export default class Sheet extends React.Component {
       accountNumber2: '',
       bettercheckResults: '',
       menu: [
-        { value: 0, label: 'Opening' },
-        { value: 1, label: 'The Need' },
-        { value: 2, label: 'PEG' },
-        { value: 3, label: 'Qualify' },
-        { value: 4, label: 'Verification ' },
-        { value: 5, label: 'Set the Stage' },
-        { value: 6, label: 'Conversion Checkpoint' },
-        { value: 7, label: 'Quotes ' },
-        { value: 8, label: 'Application Section' },
-        { value: 9, label: 'Banking ' },
-        { value: 10, label: 'Objections' },
-        { value: 11, label: 'Button Up ' },
-        { value: 12, label: 'VIPS ' },
-        { value: 13, label: 'Submit ' },
+        { ref: 'openingRef',              value: 0, label: 'Opening' },
+        { ref: 'theNeedRef',              value: 1, label: 'The Need' },
+        { ref: 'pegRef',                  value: 2, label: 'PEG' },
+        { ref: 'qualifyRef',              value: 3, label: 'Qualify' },
+        { ref: 'verificationRef',         value: 4, label: 'Verification ' },
+        { ref: 'setTheStageRef',          value: 5, label: 'Set the Stage' },
+        { ref: 'conversionCheckPointRef', value: 6, label: 'Conversion Checkpoint' },
+        { ref: 'quotesRef',               value: 7, label: 'Quotes ' },
+        { ref: 'applicationSectionRef',   value: 8, label: 'Application Section' },
+        { ref: 'bankingRef',              value: 9, label: 'Banking ' },
+        { ref: 'objectionsRef',           value: 10, label: 'Objections' },
+        { ref: 'buttonsUpRef',            value: 11, label: 'Button Up ' },
+        { ref: 'vipsRef',                 value: 12, label: 'VIPS ' },
+        { ref: 'submitRef',               value: 13, label: 'Submit ' },
 
       ]
     }
+
+    this.openingRef = React.createRef();
+    this.theNeedRef = React.createRef();
+    this.pegRef = React.createRef();
+    this.qualifyRef = React.createRef();
+    this.verificationRef = React.createRef();
+    this.setTheStageRef = React.createRef();
+    this.conversionCheckPointRef = React.createRef();
+    this.quotesRef = React.createRef();
+    this.applicationSectionRef = React.createRef();
+    this.bankingRef = React.createRef();
+    this.objectionsRef = React.createRef();
+    this.buttonsUpRef = React.createRef();
+    this.vipsRef = React.createRef();
+    this.submitRef = React.createRef();
 
   }
 
@@ -175,6 +190,8 @@ export default class Sheet extends React.Component {
   }
 
   fetchRecordData = async () => {
+
+    
 
     try {
 
@@ -218,6 +235,23 @@ export default class Sheet extends React.Component {
         recordID: null,
       })
     }
+
+  }
+
+  jumpTo = (ref) => {
+
+    const elementRef = this[ref] ? this[ref] : null;
+    if (!elementRef) return;
+
+    const currentEl = elementRef.current ? elementRef.current : null;
+    if (!currentEl) return;
+    
+    const offsetTop =  currentEl ? currentEl.offsetTop : null;
+    if (!offsetTop) return;
+    
+    console.log(elementRef)
+    const cont = document.querySelector('#ContScroll');
+    cont.scrollTo({ top: offsetTop, behavior: 'smooth' })
 
   }
 
@@ -331,7 +365,7 @@ export default class Sheet extends React.Component {
               <Nav>
                 {
                   this.state.menu.map(e => (
-                    <Nav.Item key={e.value} icon={<Icon icon="caret-right"/>}>{e.label}</Nav.Item>
+                    <Nav.Item onClick={() => this.jumpTo(e.ref)} key={e.value} icon={<Icon icon="caret-right"/>}>{e.label}</Nav.Item>
                   ))
                 }
               </Nav>
@@ -342,7 +376,7 @@ export default class Sheet extends React.Component {
 
 
           {/* --------- Sheet -------- */}
-          <div style={{ width: '100%', overflowY: 'auto' }}>
+          <div id="ContScroll" style={{ width: '100%', overflowY: 'auto' }}>
 
             <div className={styles.Container}>
 
@@ -356,7 +390,7 @@ export default class Sheet extends React.Component {
               <div style={{ display: 'grid', gridAutoRows: 'max-content', rowGap: '28px' }}>
         
         
-                <Card>
+                <Card customRef={this.openingRef}>
                   <React.Fragment>
                     <Annotation text="The Opening for Inbound"/>
                     <p>{'I just want to make sure you have some background on us:'}</p>
@@ -368,7 +402,7 @@ export default class Sheet extends React.Component {
                   </React.Fragment>
                 </Card>
         
-                <Card>
+                <Card customRef={this.theNeedRef}>
         
                   <Annotation text="How I’m Going to Serve Your Need" />
         
@@ -393,7 +427,7 @@ export default class Sheet extends React.Component {
         
         
         
-                <Card>
+                <Card customRef={this.pegRef}>
         
                   <Annotation text="PEG"/>
                   <Annotation text={"Praise, Empathy, & Gratitude as You Build Rapport, Take Notes as You Listen"}/>
@@ -523,7 +557,7 @@ export default class Sheet extends React.Component {
                 </Card>
         
         
-                <Card>
+                <Card customRef={this.qualifyRef}>
         
                   <Annotation text={'Building Significant Value & Authority as You Qualify'}/>
         
@@ -638,8 +672,8 @@ export default class Sheet extends React.Component {
                 </div>
         
                 <Divider/>
-        
-                <p>I just want to verify that I have this information correct.</p>
+                <div style={{ height: '1px' }} ref={this.verificationRef}></div>
+                <p style={{ marginTop: '36px' }}>I just want to verify that I have this information correct.</p>
                 <div style={{ padding: '0 20px' }}>
         
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr', marginBottom: '24px'}}>
@@ -675,8 +709,10 @@ export default class Sheet extends React.Component {
                 </div>
         
                 <Divider/>
-        
-                <Annotation text="If they appear to prequalify, set the stage."/>
+                  
+                <div ref={this.setTheStageRef}>
+                  <Annotation text="If they appear to prequalify, set the stage."/>
+                </div>
         
                 <p>
                   <Strong text={clientName} />
@@ -750,7 +786,7 @@ export default class Sheet extends React.Component {
               <br/>
               <br/>  
         
-              <Card>
+              <Card customRef={this.conversionCheckPointRef}>
         
                 <Annotation customStyles={{ textAlign: 'left' }} text="Conversion Checkpoint"/>
         
@@ -783,8 +819,10 @@ export default class Sheet extends React.Component {
                 <p><Strong text={clientName}/> {', okay grab that pen and paper one last time for me.'}</p>
                 <p>{'Ok great! I am going to share three outstanding options with you, are you ready?'}</p>
         
-                <Annotation customStyles={{ marginTop: '42px', marginBottom: 0, fontSize: '20px' }} text="QUOTES"/>
-                <Annotation customStyles={{ marginTop: 0 }} text="(3 Face Amounts with Premiums Ranging from $100 / $70 / $60)"/>
+                <div ref={this.quotesRef} >
+                  <Annotation customStyles={{ marginTop: '42px', marginBottom: 0, fontSize: '20px' }} text="QUOTES"/>
+                  <Annotation customStyles={{ marginTop: 0 }} text="(3 Face Amounts with Premiums Ranging from $100 / $70 / $60)"/>
+                </div>
         
                 <div style={{ display: 'flex', justifyContent:'center', marginBottom: '36px'}}>
                   <IconButton
@@ -933,8 +971,9 @@ export default class Sheet extends React.Component {
 
 
 
-        
-                <div className={styles.ContainerCarrierButtons}>
+                <div ref={this.applicationSectionRef}></div>
+
+                <div  className={styles.ContainerCarrierButtons}>
                   {
                     carriers.map(e => (
                       <div className={styles.ImgButton} onClick={() => { window.open(e.url, '_blank', 'width=960,height=500,toolbar=no') }}>
@@ -943,6 +982,8 @@ export default class Sheet extends React.Component {
                     ))
                   }
                 </div>
+
+
 
                 <div className={styles.ContainerCarrierButtons}>
                   <IconButton onClick={() => { window.open('https://reliancera.com/agents', '_blank', 'width=960,height=500,toolbar=no') }} color="green" icon={<Icon icon="check-square-o"/>}>Checking / Savings Verification</IconButton>
@@ -1007,7 +1048,8 @@ export default class Sheet extends React.Component {
                   </p>
                 </Panel>
 
-
+                
+                <div ref={this.bankingRef}></div>
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="BANKING"/>
                 <Annotation customStyles={{fontSize: '18px', margin:'12px 0px 36px 0'}} text="Talk Slow and Confident. Be sure to write everything down."/>
 
@@ -1101,6 +1143,8 @@ export default class Sheet extends React.Component {
                     />
                 
 
+
+                <div ref={this.objectionsRef}></div>
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Objections"/>
 
                 <Panel header={<span style={{ color: '#f44336' }}>Budget</span>} collapsible bordered>
@@ -1166,6 +1210,8 @@ export default class Sheet extends React.Component {
 
 
 
+
+                <div ref={this.buttonsUpRef}></div>
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Button Up"/>
         
         
@@ -1184,7 +1230,7 @@ export default class Sheet extends React.Component {
               <br/>
               <br/>
         
-              <Card>
+              <Card customRef={this.vipsRef}>
         
                 <Annotation text={'Asking for Referrals without Pushing or Begging - Using VIPS'}/>
         
@@ -1244,6 +1290,14 @@ export default class Sheet extends React.Component {
                 <p>I’ll give you back the rest of your day. </p>
                 <p>My pleasure to serve you today <Strong text={clientName}/> </p>
                 <p>Bye for now.</p>
+
+                <div ref={this.submitRef}></div>
+
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '320px' }}>
+                  <IconButton style={{ width: '160px', fontWeight:'500' }} placement="right" color="blue" icon={<Icon icon="send" />}>
+                        Submit
+                  </IconButton>
+                </div>
         
               </Card>
         

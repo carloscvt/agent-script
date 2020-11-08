@@ -5,10 +5,10 @@ export default class Card extends React.Component {
 
   render() {
 
-    const {children, title} = this.props;
+    const {children, title, customRef} = this.props;
 
     return (
-      <div className={`${styles.Card} ${title ? styles.Cols : ''}`}>
+      <div ref={customRef} className={`${styles.Card} ${title ? styles.Cols : ''}`}>
 
         { title && this.renderTitle(title) }
         { children }
