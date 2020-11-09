@@ -1,18 +1,17 @@
-import React, { isValidElement } from 'react';
-import { CheckPicker, Divider, Icon, IconButton, Input, InputPicker, Timeline, Loader, Button, CheckboxGroup, Checkbox, InputGroup, Panel, Sidenav, Nav } from 'rsuite';
-import IconReliancera from '../../assets/reliancera-icon.png';
-import { carriers, data, diseases, laborStatusOptions, initialDraftDates, benefitDates } from '../../data';
+import fetch from 'isomorphic-unfetch';
+import React from 'react';
+import Currency from 'react-currency-formatter';
+import { Checkbox, CheckboxGroup, Divider, Icon, IconButton, Input, InputGroup, InputPicker, Loader, Nav, Panel, Sidenav, Timeline } from 'rsuite';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import urljoin from 'url-join';
+import { benefitDates, carriers, data, diseases, initialDraftDates, laborStatusOptions } from '../../data';
+import { baseUrl, dev } from '../../utils';
 import Annotation from '../Annotation/Annotation';
 import Card from '../Card/Card';
 import { QuestionBool, QuestionPicker, QuestionStr, QuestionTwoFields } from '../Question/Question';
 import Referrals from '../Referrals/Referrals';
 import styles from './Sheet.module.css';
-import fetch from 'isomorphic-unfetch';
-import urljoin from 'url-join';
-import { baseUrl } from '../../utils';
-import Currency from 'react-currency-formatter';
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 
 const MySwal = withReactContent(Swal);
 
@@ -230,15 +229,7 @@ export default class Sheet extends React.Component {
       if (request.status === 200) {
 
         this.setState({
-          state: json.state,
-          zip: json.zip,
-          phone: json.phone,
-          firstName: json.firstName,
-          lastName: json.lastName,
-          birthDate: json.birthDate,
-          city: json.city,
-          address: json.address,
-          email: json.email,
+          ...json,
           isLoading: false,
           fullName: `${json.firstName} ${json.lastName}`
         })
@@ -1042,7 +1033,7 @@ export default class Sheet extends React.Component {
                     <div>
                       <span>Now <Strong text={clientName} />, most people start their coverage as soon as possible. Does that work for you?</span>
                       <hr/>
-                      <span style={{color: '#f44336'}}>(IF NO>FUTURE PAYMENT CLOSE)</span>
+                      <span style={{color: '#f44336'}}>{'(IF NO>FUTURE PAYMENT CLOSE)'}</span>
                     </div>
                   )}
                   />
@@ -1513,6 +1504,11 @@ export default class Sheet extends React.Component {
           confirmButtonColor: '#4CAF50',
           confirmButtonText: 'Close',
           allowOutsideClick: false,
+          preConfirm: async () => {
+            if (!dev) {
+              window.location.replace("https://reliancera.com/");
+            }
+          }
         })
       }
 
