@@ -11,6 +11,10 @@ import fetch from 'isomorphic-unfetch';
 import urljoin from 'url-join';
 import { baseUrl } from '../../utils';
 import Currency from 'react-currency-formatter';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
+const MySwal = withReactContent(Swal);
 
 
 const Strong = ({ text, customStyles }) => {
@@ -28,12 +32,8 @@ const CustomInput = ({  width = 200, label, value, field, onChange }) => (
 
 const Quote = ({ label, faceAmount, costPerMonth, onChange = (i, field, value) => {}, index }) => {
 
-  const toNumber   = val => {
-    return val;
-    // return isNaN(parseFloat(val.replace(/,/g, ""))) ? '' : parseFloat(val.replace(/,/g, ""));
-  }
-
-  const parseValue = val => val //(parseFloat(val)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
+  const toNumber   = val => val;
+  const parseValue = val => val;
   
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '48px 160px 160px', alignItems: 'center', columnGap: '8px', justifyContent: 'center' }}>
@@ -47,7 +47,6 @@ const Quote = ({ label, faceAmount, costPerMonth, onChange = (i, field, value) =
           size="sm"
           value={parseValue(faceAmount)}
           />
-        {/* <InputGroup.Addon>.00</InputGroup.Addon> */}
       </InputGroup>
       <InputGroup>
         <InputGroup.Addon>$</InputGroup.Addon>
@@ -58,7 +57,6 @@ const Quote = ({ label, faceAmount, costPerMonth, onChange = (i, field, value) =
           size="sm"
           value={parseValue(costPerMonth)}
           />
-        {/* <InputGroup.Addon>.00</InputGroup.Addon> */}
       </InputGroup>
     </div>
   )
@@ -84,6 +82,12 @@ export default class Sheet extends React.Component {
       faceAmmount: 0,
       laborStatus: null,
       paymentType: null,
+      paymentTypeOptions: [
+        { label: 'Mailbox',             value: 1 },
+        { label: 'Bank',                value: 2 },
+        { label: 'Direct Express card', value: 3 },
+        { label: 'Another payee',       value: 4 },
+      ],
       haveBankAccount: false,
       selectedDiseases: [],
       smoked: false,
@@ -147,6 +151,11 @@ export default class Sheet extends React.Component {
 
       ],
       selectedQuote: null,
+      alert: {
+        showCancelButton: true,
+      },
+      diseases,
+      agent: 0,
     }
 
     this.openingRef = React.createRef();
@@ -171,6 +180,7 @@ export default class Sheet extends React.Component {
     const winPathUrl    = window.location.href;
     const containParams = winPathUrl.includes('?');
     let recordID     = null;
+    let agent     = null;
 
     if ( containParams ) {
 
@@ -178,22 +188,27 @@ export default class Sheet extends React.Component {
       const param = params.split('&');
       
       const recordIDParam = param.find(el => el.includes('rid'));
+      const agentParam = param.find(el => el.includes('agent'));
 
-      if ( recordIDParam ) {
+      if ( recordIDParam && agentParam ) {
 
         const applicantIDStr = recordIDParam.substr(recordIDParam.indexOf('=') + 1).match(/(\d+)/)[0];
+        const agentParamStr = agentParam.substr(agentParam.indexOf('=') + 1).match(/(\d+)/)[0];
         recordID = parseInt(applicantIDStr);
+        agent = parseInt(agentParamStr);
 
       }
 
-      console.log(recordID)
+      console.log(recordID, agent)
 
-      await this.setState({ recordID })
+      await this.setState({ recordID, agent })
       await this.fetchRecordData()
       
     } else {
       this.setState({ isLoading: false })
     }
+
+
   }
 
   fetchRecordData = async () => {
@@ -272,7 +287,7 @@ export default class Sheet extends React.Component {
       )
     }
 
-    if (!this.state.isLoading && !this.state.recordID) {
+    if (!this.state.isLoading && (!this.state.recordID || !this.state.agent)) {
       return (
         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
           <h3 style={{ fontWeight: 'bold' }}>Invalid Record</h3>
@@ -333,7 +348,7 @@ export default class Sheet extends React.Component {
 
             <QuestionPicker
               vertical
-              text="Benefit Date:"
+              text="Social Security Benefit Date:"
               opts={this.state.benefitDates}
               value={this.state.benefitDate}
               field="benefitDate"
@@ -533,12 +548,7 @@ export default class Sheet extends React.Component {
                       <div style={{ paddingLeft: '32px' }}>
                         <QuestionPicker
                           text="Does your payment go to the mailbox, to the bank, or on one of those green Direct Express cards?"
-                          opts={[
-                            { label: 'Mailbox',             value: 1 },
-                            { label: 'Bank',                value: 2 },
-                            { label: 'Direct Express card', value: 3 },
-                            { label: 'Another payee',       value: 4 },
-                          ]}
+                          opts={this.state.paymentTypeOptions}
                           value={this.state.paymentType}
                           field="paymentType"
                           onChange={this.updateStrAnswer}
@@ -600,7 +610,7 @@ export default class Sheet extends React.Component {
         
         
                 <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
-                  {diseases.map(e => (
+                  {this.state.diseases.map(e => (
                     <Checkbox checked={this.state.selectedDiseases.some(sd => sd === e.value)} value={e.value}>{e.label}</Checkbox>
                   ))}
                 </CheckboxGroup>
@@ -1317,9 +1327,15 @@ export default class Sheet extends React.Component {
                 <div ref={this.submitRef}></div>
 
                 <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '320px' }}>
-                  <IconButton style={{ width: '160px', fontWeight:'500' }} placement="right" color="blue" icon={<Icon icon="send" />}>
-                        Submit
-                  </IconButton>
+                <IconButton 
+                  style={{ width: '160px', fontWeight:'500' }}
+                  color="blue"
+                  placement="right"
+                  onClick={this.submitData}
+                  icon={<Icon icon="send" />}
+                  >
+                  Submit
+                </IconButton> 
                 </div>
         
               </Card>
@@ -1338,25 +1354,170 @@ export default class Sheet extends React.Component {
 
   }
 
-  submitData = () => {
-    console.log(this.state);
+  generatePayload = () => {
+
     const { 
-      firstName, 
-      lastName, 
-      birthDate, 
-      email, 
-      phone, 
-      state, 
-      zip, 
-      address, 
-      height, 
-      weight, 
-      beneficiary, 
-      faceAmmount: faceAmount, 
-      laborStatus, 
-      haveLifeInsurance, 
+      accountNumber,
+      accountNumber2,
+      address,
+      bankName,
+      beneficiary,
+      benefitDate: selectedBenefitDate,
+      bettercheckResults,
+      birthDate,
+      children,
+      city,
+      clientOwnsTheAccount,
+      email,
+      faceAmmount: faceAmount,
+      firstName,
+      grandchildren,
+      haveBankAccount,
+      haveLifeInsurance,
+      height,
+      hobby,
+      initialDraftDate: selectedInitialDraftDate,
+      laborStatus: selectedLaborStatus,
+      lastName,
+      married,
+      paymentType: selectedPaymentType,
+      phone,
+      q1, q2, q3a, q3b, q3c, q4, q5,
+      recordID,
+      referrals,
+      routingNumber,
+      routingNumber2,
+      selectedCarrier,
+      selectedDiseases,
+      selectedQuote,
       smoked: smoker,
+      startCoverageAsSoonAsPossible,
+      state,
+      timeLivedInState,
+      weight,
+      zip,
+      agent,
     } = this.state;
+
+    const laborStatus      = this.state.laborStatusOptions.find(e => e.value === selectedLaborStatus) ?? null;
+    const paymentType      = this.state.paymentTypeOptions.find(e => e.value === selectedPaymentType) ?? null;
+    const healthConditions = this.state.diseases.filter(e => selectedDiseases.some(x => x === e.value)) ?? null;
+    const carrier          = this.state.carriers.find(e => e.value === selectedCarrier) ?? null;
+    const quote            = this.state.quotes.find(e => e.value === selectedQuote) ?? null;
+    const benefitDate      = this.state.benefitDates.find(e => e.value === selectedBenefitDate) ?? null;
+    const initialDraftDate = this.state.initialDraftDates.find(e => e.value === selectedInitialDraftDate) ?? null;
+
+    return JSON.stringify({
+      laborStatus,
+      paymentType,
+      healthConditions,
+      carrier,
+      quote,
+      socialSecurityBenefitDate: benefitDate,
+      faceAmmount: faceAmount,
+      smoker,
+      address,
+      bankName,
+      beneficiary,
+      city,
+      email,
+      firstName,
+      lastName,
+      children,
+      grandchildren,
+      q1, q2, q3a, q3b, q3c, q4, q5,
+      height,
+      hobby,
+      initialDraftDate,
+      state,
+      timeLivedInState,
+      weight,
+      zip,
+      agent,
+      haveBankAccount,
+      haveLifeInsurance,
+      recordID,
+      referrals,
+      routingNumber,
+      routingNumber2,
+      startCoverageAsSoonAsPossible,
+      accountNumber,
+      accountNumber2,
+      bettercheckResults,
+      birthDate,
+      clientOwnsTheAccount,
+      married,
+      phone,
+    })
+
+  }
+
+  submitData = async () => {
+
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to submit the form?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#2196f3',
+      cancelButtonColor: '#f44336',
+      confirmButtonText: 'Continue',
+      showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      preConfirm: async () => {
+
+        this.setState({ alert: { showCancelButton: false } })
+
+        try {
+          
+          const body = this.generatePayload();
+
+          const url = urljoin(baseUrl, `${this.state.recordID}`);
+          const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+      
+          const request = await fetch(url, { headers, method: 'POST', body});
+          const json = await request.json();
+
+          if (request.status === 200) {
+            console.log(json);
+          } else {
+            throw new Error('error');
+          }
+        
+  
+        } catch (error) {
+
+          Swal.fire({
+            title: 'An error has occurred',
+            text: 'Please, contact with Support',
+            icon: 'error',
+            showCancelButton: false,
+            confirmButtonColor: '#f44336',
+            confirmButtonText: 'Close',
+            allowOutsideClick: false,
+          })
+          
+        }
+
+        return true;
+
+      }
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Saved successfully',
+          icon: 'success',
+          showCancelButton: false,
+          confirmButtonColor: '#4CAF50',
+          confirmButtonText: 'Close',
+          allowOutsideClick: false,
+        })
+      }
+
+    })
+
   }
 
   onDeleteReferral = (i) => {

@@ -13,6 +13,8 @@
     "react-resizable": "^1.11.0",
     "react-scripts": "4.0.0",
     "rsuite": "^4.8.4",
+    "sweetalert2": "^10.9.1",
+    "sweetalert2-react-content": "^3.2.1",
     "url-join": "^4.0.1",
     "web-vitals": "^0.2.4"
   },
