@@ -191,17 +191,25 @@ export default class Sheet extends React.Component {
 
       if ( recordIDParam && agentParam ) {
 
-        const applicantIDStr = recordIDParam.substr(recordIDParam.indexOf('=') + 1).match(/(\d+)/)[0];
-        const agentParamStr = agentParam.substr(agentParam.indexOf('=') + 1).match(/(\d+)/)[0];
-        recordID = parseInt(applicantIDStr);
-        agent = parseInt(agentParamStr);
+        const applicantIDStr = recordIDParam.substr(recordIDParam.indexOf('=') + 1).match(/(\d+)/);
+        const agentParamStr = agentParam.substr(agentParam.indexOf('=') + 1).match(/(\d+)/);
 
+        if (applicantIDStr && agentParamStr) {
+
+          recordID = parseInt(applicantIDStr[0]);
+          agent = parseInt(agentParamStr[0]);
+
+          await this.setState({ recordID, agent })
+          await this.fetchRecordData()
+          
+        } else {
+          await this.setState({ isLoading: false })
+        } 
+
+      } else {
+        await this.setState({ isLoading: false })
       }
 
-      console.log(recordID, agent)
-
-      await this.setState({ recordID, agent })
-      await this.fetchRecordData()
       
     } else {
       this.setState({ isLoading: false })
@@ -216,8 +224,10 @@ export default class Sheet extends React.Component {
 
     try {
 
-      const url = urljoin(baseUrl, `${this.state.recordID}`);
-      console.log(url)
+      const agent = this.state.agent;
+
+      const url = `${urljoin(baseUrl, `${this.state.recordID}`)}?agent=${agent ? agent : 0}`;
+
       const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
