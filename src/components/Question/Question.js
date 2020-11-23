@@ -11,29 +11,29 @@ export const QuestionStr = ({ text, value, onChange, field }) => (
   </div>
 )
 
-export const QuestionBool = ({ text, centerToggle = false, value, onChange, field, vertical }) => {
+export const QuestionBool = ({ text, centerToggle = false, value, onChange, field, vertical, small = false, className = ''}) => {
 
   if (vertical) {
     return (
-      <div className={styles.ContainerVertical}>
+      <div className={`${styles.ContainerVertical} ${className}`}>
         <small style={{ textAlign: 'center' }}>{text}</small>
         <div 
           className={styles.Center} 
           >
-          <Toggle checked={value} onChange={(val) => onChange(val, field)} size="lg" checkedChildren="Yes" unCheckedChildren="No" />
+          <Toggle checked={value} onChange={(val) => onChange(val, field)} size={ small ? 'md' : 'lg'} checkedChildren="Yes" unCheckedChildren="No" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className={styles.Container}>
+    <div className={`${styles.Container} ${className}`}>
       <div className={styles.VerticalCenter}>{text}</div>
       <div 
         className={styles.VerticalCenter} 
         style={{ justifyContent: centerToggle ? 'center' : 'flex-start' }}
         >
-        <Toggle checked={value} onChange={(val) => onChange(val, field)} size="lg" checkedChildren="Yes" unCheckedChildren="No" />
+        <Toggle checked={value} onChange={(val) => onChange(val, field)} size={ small ? 'md' : 'lg'} checkedChildren="Yes" unCheckedChildren="No" />
       </div>
     </div>
   )
@@ -57,17 +57,17 @@ export const QuestionTwoFields = ({ text, fields = [], onChange }) => (
   </div>
 )
 
-export const QuestionPicker = ({ text, opts, value, onChange, field, vertical = false}) => {
+export const QuestionPicker = ({ text, opts, value, onChange, field, vertical = false, small = false, className = ''}) => {
 
 
   if (vertical) {
 
     return (
-      <div className={styles.ContainerVertical}>
+      <div className={`${styles.ContainerVertical} ${className}`}>
         <small>{text}</small>
         <InputPicker 
           cleanable={false}
-          size="md"
+          size={ small ? 'sm' : 'md'}
           style={{ height: 'max-content' }}
           defaultValue={value}
           value={value}
@@ -81,7 +81,7 @@ export const QuestionPicker = ({ text, opts, value, onChange, field, vertical = 
   }
 
   return (
-    <div className={styles.Container}>
+    <div className={`${styles.Container} ${className}`}>
       <div className={styles.VerticalCenter}>{text}</div>
       <InputPicker 
         cleanable={false}

@@ -113,3 +113,89 @@
   padding: 16px 24px;
   border-radius: 6px;
 }
+
+.firstName {
+  grid-area: firstName;
+}
+
+.lastName {
+  grid-area: lastName;
+}
+
+.birthDate {
+  grid-area: birthDate;
+}
+
+.email {
+  grid-area: email;
+}
+
+.phone {
+  grid-area: phone;
+}
+
+.state {
+  grid-area: state;
+}
+
+.zip {
+  grid-area: zip;
+}
+
+.address {
+  grid-area: address;
+}
+
+.height {
+  grid-area: height;
+}
+
+.weight {
+  grid-area: weight;
+}
+
+.beneficiary {
+  grid-area: beneficiary;
+}
+.faceAmmount {
+  grid-area: faceAmmount;
+}
+
+.laborStatus {
+  grid-area: laborStatus;
+}
+
+.initialDraftDate {
+  grid-area: initialDraftDate;
+}
+
+.benefitDate {
+  grid-area: benefitDate;
+}
+
+.haveLifeInsurance {
+  grid-area: haveLifeInsurance;
+}
+
+.smoked {
+  grid-area: smoked;
+}
+
+.SubmitButton {
+  grid-area:   submitButton;
+  display:     flex;
+  align-items: flex-end;
+  width:       100%;
+  justify-content: center;
+}
+
+.ContainerFixedFields {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 6px;
+  grid-template-areas: 
+  "firstName firstName lastName lastName birthDate birthDate email email phone phone state zip"
+  "address address height weight beneficiary beneficiary faceAmmount faceAmmount laborStatus laborStatus initialDraftDate benefitDate"
+  "haveLifeInsurance haveLifeInsurance smoked submitButton . . . . . . . ."
+  ;
+}

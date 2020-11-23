@@ -3,7 +3,6 @@ import React from 'react';
 import Currency from 'react-currency-formatter';
 import { Checkbox, CheckboxGroup, Divider, Icon, IconButton, Input, InputGroup, InputPicker, Loader, Nav, Panel, Sidenav, Timeline } from 'rsuite';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 import urljoin from 'url-join';
 import { benefitDates, carriers, data, diseases, initialDraftDates, laborStatusOptions } from '../../data';
 import { baseUrl, dev } from '../../utils';
@@ -13,17 +12,15 @@ import { QuestionBool, QuestionPicker, QuestionStr, QuestionTwoFields } from '..
 import Referrals from '../Referrals/Referrals';
 import styles from './Sheet.module.css';
 
-const MySwal = withReactContent(Swal);
-
 
 const Strong = ({ text, customStyles }) => {
 return <span style={{  color: '#3498ff', fontSize: '20px', fontWeight: 500, ...customStyles }}>{text}</span>
 }
 
-const CustomInput = ({  width = 200, label, value, field, onChange }) => (
-  <div style={{ width: `${width}px`, margin: '4px 6px' }}>
+const CustomInput = ({  className = '', label, value, field, onChange, small = false }) => (
+  <div className={className} style={{ width: '100%' }}>
     <small>{label}:</small>
-    <Input value={value} onChange={(val) => onChange(val, field)}/>
+    <Input size={small ? 'sm' : 'md'} value={value} onChange={(val) => onChange(val, field)}/>
   </div>
 )
 
@@ -157,20 +154,20 @@ export default class Sheet extends React.Component {
       agent: 0,
     }
 
-    this.openingRef = React.createRef();
-    this.theNeedRef = React.createRef();
-    this.pegRef = React.createRef();
-    this.qualifyRef = React.createRef();
+    this.openingRef      = React.createRef();
+    this.theNeedRef      = React.createRef();
+    this.pegRef          = React.createRef();
+    this.qualifyRef      = React.createRef();
     this.verificationRef = React.createRef();
-    this.setTheStageRef = React.createRef();
+    this.setTheStageRef  = React.createRef();
     this.conversionCheckPointRef = React.createRef();
-    this.quotesRef = React.createRef();
-    this.applicationSectionRef = React.createRef();
-    this.bankingRef = React.createRef();
-    this.objectionsRef = React.createRef();
-    this.buttonsUpRef = React.createRef();
-    this.vipsRef = React.createRef();
-    this.submitRef = React.createRef();
+    this.quotesRef               = React.createRef();
+    this.applicationSectionRef   = React.createRef();
+    this.bankingRef              = React.createRef();
+    this.objectionsRef           = React.createRef();
+    this.buttonsUpRef            = React.createRef();
+    this.vipsRef                 = React.createRef();
+    this.submitRef               = React.createRef();
 
   }
 
@@ -219,8 +216,6 @@ export default class Sheet extends React.Component {
   }
 
   fetchRecordData = async () => {
-
-    
 
     try {
 
@@ -272,7 +267,6 @@ export default class Sheet extends React.Component {
     const offsetTop =  currentEl ? currentEl.offsetTop : null;
     if (!offsetTop) return;
     
-    console.log(elementRef)
     const cont = document.querySelector('#ContScroll');
     cont.scrollTo({ top: offsetTop, behavior: 'smooth' })
 
@@ -314,73 +308,75 @@ export default class Sheet extends React.Component {
           <div style={{ display:'flex', flexWrap: 'wrap', maxWidth: '1280px', margin: '0 auto', justifyContent:'center' }}>
 
 
+            <div className={styles.ContainerFixedFields}>
+              <CustomInput className={styles.firstName}   small field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
+              <CustomInput className={styles.lastName}    small field="lastName"  label="Last Name"  onChange={this.updateStrAnswer} value={this.state.lastName}  />
+              <CustomInput className={styles.birthDate}   small field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
+              <CustomInput className={styles.email}       small field="email"     label="Email"      onChange={this.updateStrAnswer} value={this.state.email}     />
+              <CustomInput className={styles.phone}       small field="phone"     label="Phone"      onChange={this.updateStrAnswer} value={this.state.phone}     />
+              <CustomInput className={styles.state}       small field="state"     label="State"      onChange={this.updateStrAnswer} value={this.state.state}     />
+              <CustomInput className={styles.zip}         small field="zip"       label="Zip"        onChange={this.updateStrAnswer} value={this.state.zip}       />
+              <CustomInput className={styles.address}     small field="address"   label="Address"    onChange={this.updateStrAnswer} value={this.state.address}   />
+              <CustomInput className={styles.height}      small field="height"    label="Height"     onChange={this.updateStrAnswer} value={this.state.height}    />
 
-            <CustomInput field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
-            <CustomInput field="lastName" label="Last Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
-            <CustomInput field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
-            <CustomInput field="email" label="Email" onChange={this.updateStrAnswer} value={this.state.email} />
-            <CustomInput field="phone" label="Phone" onChange={this.updateStrAnswer} value={this.state.phone} />
-            <CustomInput field="state" label="State" onChange={this.updateStrAnswer} value={this.state.state} />
-            <CustomInput field="zip" label="Zip" onChange={this.updateStrAnswer} value={this.state.zip} />
-            <CustomInput field="address" label="Address" onChange={this.updateStrAnswer} value={this.state.address} />
-            <CustomInput field="height" label="Height" onChange={this.updateStrAnswer} value={this.state.height} />
+              <CustomInput className={styles.weight}      small field="weight"      label="Weight"      onChange={this.updateStrAnswer} value={this.state.weight}      />
+              <CustomInput className={styles.beneficiary} small field="beneficiary" label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
+              <CustomInput className={styles.faceAmmount} small field="faceAmmount" label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
 
-            <CustomInput field="weight" label="Weight" onChange={this.updateStrAnswer} value={this.state.weight} />
-            <CustomInput field="beneficiary" label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
-            <CustomInput field="faceAmmount" label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
+              <QuestionPicker
+                vertical small
+                text="Labor Status:"
+                opts={this.state.laborStatusOptions}
+                value={this.state.laborStatus}
+                field="laborStatus" className={styles.laborStatus}
+                onChange={this.updateStrAnswer}
+                />
 
-            <QuestionPicker
-              vertical
-              text="Labor Status:"
-              opts={this.state.laborStatusOptions}
-              value={this.state.laborStatus}
-              field="laborStatus"
-              onChange={this.updateStrAnswer}
-              />
+              <QuestionPicker
+                vertical small
+                text="Initial Draft Date:"
+                opts={this.state.initialDraftDates}
+                value={this.state.initialDraftDate}
+                field="initialDraftDate" className={styles.initialDraftDate}
+                onChange={this.updateStrAnswer}
+                />
 
-            <QuestionPicker
-              vertical
-              text="Initial Draft Date:"
-              opts={this.state.initialDraftDates}
-              value={this.state.initialDraftDate}
-              field="initialDraftDate"
-              onChange={this.updateStrAnswer}
-              />
+              <QuestionPicker
+                vertical small
+                text="S.S. Benefit Date:"
+                opts={this.state.benefitDates}
+                value={this.state.benefitDate}
+                field="benefitDate" className={styles.benefitDate}
+                onChange={this.updateStrAnswer}
+                />
 
-            <QuestionPicker
-              vertical
-              text="Social Security Benefit Date:"
-              opts={this.state.benefitDates}
-              value={this.state.benefitDate}
-              field="benefitDate"
-              onChange={this.updateStrAnswer}
-              />
+              <QuestionBool vertical centerToggle small
+                text="Currently have Life Insurance:"
+                value={this.state.haveLifeInsurance}
+                field="haveLifeInsurance" className={styles.haveLifeInsurance}
+                onChange={this.updateStrAnswer}
+                />
+              <QuestionBool vertical centerToggle small
+                text="Smoker:"
+                value={this.state.smoked}
+                field="smoked" className={styles.smoked}
+                onChange={this.updateStrAnswer}
+                />
 
-            <QuestionBool vertical centerToggle
-              text="Currently have Life Insurance:"
-              value={this.state.haveLifeInsurance}
-              field="haveLifeInsurance"
-              onChange={this.updateStrAnswer}
-              />
-            <QuestionBool vertical centerToggle
-              text="Smoker:"
-              value={this.state.smoked}
-              field="smoked"
-              onChange={this.updateStrAnswer}
-              />
+              <div className={styles.SubmitButton}>
+                <IconButton 
+                  style={{ width: '160px', fontWeight:'500' }}
+                  color="blue"
+                  placement="right"
+                  onClick={this.submitData}
+                  icon={<Icon icon="send" />}
+                  >
+                  Submit
+                </IconButton> 
+              </div>
 
-            <div style={{ display: 'flex', alignItems: 'flex-end', width: '200px', justifyContent: 'center' }}>
-              <IconButton 
-                style={{ width: '160px', fontWeight:'500' }}
-                color="blue"
-                placement="right"
-                onClick={this.submitData}
-                icon={<Icon icon="send" />}
-                >
-                Submit
-              </IconButton> 
+
             </div>
-
 
           </div>
         </div>
