@@ -181,6 +181,10 @@
   grid-area: smoked;
 }
 
+.monthlyPremium {
+  grid-area: monthlyPremium;
+}
+
 .SubmitButton {
   grid-area:   submitButton;
   display:     flex;
@@ -195,7 +199,29 @@
   column-gap: 6px;
   grid-template-areas: 
   "firstName firstName lastName lastName birthDate birthDate email email phone phone state zip"
-  "address address height weight beneficiary beneficiary faceAmmount faceAmmount laborStatus laborStatus initialDraftDate benefitDate"
-  "haveLifeInsurance haveLifeInsurance smoked submitButton . . . . . . . ."
+  "address address height weight beneficiary beneficiary faceAmmount faceAmmount monthlyPremium monthlyPremium laborStatus laborStatus"
+  "initialDraftDate initialDraftDate benefitDate benefitDate haveLifeInsurance haveLifeInsurance smoked submitButton . . . ."
   ;
+}
+
+
+
+
+.RowT {
+  /* border-bottom: 1px solid #EEEEEE; */
+  padding: 8px 12px;
+}
+
+.ContainerTable {
+  width: calc(100% - 40px);
+  margin: auto;
+}
+
+.CH {
+  border-bottom: 1px solid #EEEEEE;
+}
+
+.CH .rs-checkbox-checker {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
 }

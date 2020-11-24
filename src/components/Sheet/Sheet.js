@@ -4,7 +4,7 @@ import Currency from 'react-currency-formatter';
 import { Checkbox, CheckboxGroup, Divider, Icon, IconButton, Input, InputGroup, InputPicker, Loader, Nav, Panel, Sidenav, Timeline } from 'rsuite';
 import Swal from 'sweetalert2';
 import urljoin from 'url-join';
-import { benefitDates, carriers, data, diseases, initialDraftDates, laborStatusOptions } from '../../data';
+import { benefitDates, carriers, data, diseases, initialDraftDates, laborStatusOptions, diagnosisData } from '../../data';
 import { baseUrl, dev } from '../../utils';
 import Annotation from '../Annotation/Annotation';
 import Card from '../Card/Card';
@@ -152,6 +152,7 @@ export default class Sheet extends React.Component {
       },
       diseases,
       agent: 0,
+      monthlyPremium: 0,
     }
 
     this.openingRef      = React.createRef();
@@ -319,9 +320,10 @@ export default class Sheet extends React.Component {
               <CustomInput className={styles.address}     small field="address"   label="Address"    onChange={this.updateStrAnswer} value={this.state.address}   />
               <CustomInput className={styles.height}      small field="height"    label="Height"     onChange={this.updateStrAnswer} value={this.state.height}    />
 
-              <CustomInput className={styles.weight}      small field="weight"      label="Weight"      onChange={this.updateStrAnswer} value={this.state.weight}      />
-              <CustomInput className={styles.beneficiary} small field="beneficiary" label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
-              <CustomInput className={styles.faceAmmount} small field="faceAmmount" label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
+              <CustomInput className={styles.weight}      small field="weight"         label="Weight"      onChange={this.updateStrAnswer} value={this.state.weight}      />
+              <CustomInput className={styles.beneficiary} small field="beneficiary"    label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
+              <CustomInput className={styles.faceAmmount} small field="faceAmmount"    label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
+              <CustomInput className={styles.monthlyPremium} small field="monthlyPremium" label="Monthly Premium" onChange={this.updateStrAnswer} value={this.state.monthlyPremium} />
 
               <QuestionPicker
                 vertical small
@@ -343,7 +345,7 @@ export default class Sheet extends React.Component {
 
               <QuestionPicker
                 vertical small
-                text="S.S. Benefit Date:"
+                text="Social Security Benefit Date:"
                 opts={this.state.benefitDates}
                 value={this.state.benefitDate}
                 field="benefitDate" className={styles.benefitDate}
@@ -420,7 +422,6 @@ export default class Sheet extends React.Component {
                 <Card customRef={this.openingRef}>
                   <React.Fragment>
                     <Annotation text="The Opening for Inbound"/>
-                    <p>{'I just want to make sure you have some background on us:'}</p>
                     <div>
                       { 
                         inbound.content.map(text => (<p>{ text } </p> ))
@@ -466,12 +467,7 @@ export default class Sheet extends React.Component {
         
         
                     <div style={{ padding: '0 36px', margin: '48px 0', gridAutoRows: 'max-content', rowGap: '12px', display: 'grid'}}>
-                      <QuestionStr 
-                        text="Speaking of fun, what do you do for fun? Favorite hobby?"
-                        field="hobby"
-                        value={this.state.hobby}
-                        onChange={this.updateStrAnswer}
-                        />
+
                       <QuestionStr 
                         text={ <span>How long have you lived in <Strong text={clientState}/>?</span>}
                         value={this.state.timeLivedInState}
@@ -493,7 +489,7 @@ export default class Sheet extends React.Component {
                       <span>{'______. (take your time, let me know when you\'re ready).'}</span>
                     </p>
                     <p style={{ margin: '18px 0px !important' }}>
-                      {'Thank you for writing that down. Now, I\'d love to know more about your situation to better understand how I can be of service. Let\'s walk through the things that your family might need to have relieved when that inevitable day comes.'}
+                      {'Thank you for writing that down. Now, I\'d love to know more about your situation to better understand how I can be of service.'}
                     </p>
                     <p style={{ margin: '18px 0px !important' }}>
                       {"First, let's discuss who you're wanting to protect, IF I can get you qualified TODAY:"}
@@ -524,12 +520,7 @@ export default class Sheet extends React.Component {
                         onChange={this.updateStrAnswer}
                         />
 
-                      <QuestionStr 
-                        text="If I had to write you a check to pay off all your debt today plus pay for your final arrangements, how much do you think I might need to write that out for?"
-                        value={this.state.faceAmmount}
-                        field="faceAmmount"
-                        onChange={this.updateStrAnswer}
-                        />
+
 
                       <QuestionPicker
                         text="Are you currently employed, retired, or on social security disability?"
@@ -551,25 +542,6 @@ export default class Sheet extends React.Component {
                           onChange={this.updateStrAnswer}
                           />
                       </div>
-                      
-                      {/* <div style={{ paddingLeft: '72px' }}>
-                        <Annotation customStyles={{ textAlign: 'left', marginTop: '36px', paddingLeft: '10px'}} text="If by mailbox:"/>
-                        <div  style={{ paddingLeft: '0px' }}>
-                          <QuestionBool 
-                            text="Okay do you have a bank account,  Direct Express card or a different payee?"
-                            field="haveBankAccount"
-                            value={this.state.haveBankAccount}
-                            onChange={this.updateStrAnswer}
-                            />
-                        </div>
-        
-                        <Annotation 
-                          customStyles={{ textAlign: 'left', marginTop: '36px', paddingLeft: '10px', fontSize: '18px'}}
-                          text="If not STOP and thank the customer for their time."
-                          />
-
-                      </div> */}
-        
         
                     </div>
         
@@ -595,7 +567,18 @@ export default class Sheet extends React.Component {
                   <Strong text={clientName}/>
                   {', I don’t work for any particular insurance company, so I don’t have a dog in this fight today, I just simply fight and work FOR YOU, okay?'}
                 </p>
-                <p>{'Great! Let’s see if I can get you pre approved without having to do a medical exam. I just have a few health questions for you….'}</p>
+
+                <QuestionStr 
+                  text="If I had to write you a check to pay off all your debt today plus pay for your final arrangements, how much do you think I might need to write that out for?"
+                  value={this.state.faceAmmount}
+                  field="faceAmmount"
+                  onChange={this.updateStrAnswer}
+                  />
+
+                <p>
+                  {'Do you smoke or chew, or chase any men/women that do? '}
+                  <span style={{color: '#f44336'}}>(ICEBREAKER)</span>
+                </p>
         
                 <Divider/>
                 <p>
@@ -604,14 +587,33 @@ export default class Sheet extends React.Component {
                   {', do you have any challenges with your health?'}
                 </p>
         
+                <Annotation customStyles={{ textAlign: 'left' }} text="Knockout: If Yes to Any Below then Go straight to GWIC Quote/app" />
         
-        
-                <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+                <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr', paddingLeft:'32px' }}>
                   {this.state.diseases.map(e => (
                     <Checkbox checked={this.state.selectedDiseases.some(sd => sd === e.value)} value={e.value}>{e.label}</Checkbox>
                   ))}
                 </CheckboxGroup>
         
+                <Annotation customStyles={{ textAlign: 'center' }} text="IF no to above: Continue to Determine Level, Modified or Graded " />
+
+                <div className={styles.ContainerTable}>
+                  <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr', paddingLeft:'32px' }}>
+                    { 
+                      diagnosisData.data.map(row => (
+                        <Checkbox className={styles.CH} checked={this.state.selectedDiseases.some(sd => sd === row.value)} value={row.value}>
+                          <div className={styles.RowT} style={{ display: 'flex', ...row.style }}>
+                            { 
+                              diagnosisData.fields.map(f => (<div style={{ width: f.width, ...f.style, ...row.fStyle }} >{ row[f.value] }</div>))
+                            }
+                          </div>
+                        </Checkbox>
+                      ))
+                    }
+
+                  </CheckboxGroup>
+
+                </div>
         
                 <br/>
                 <br/>
@@ -620,10 +622,7 @@ export default class Sheet extends React.Component {
         
                 <Divider/>
                 
-                <p>
-                  {'Do you smoke or chew, or chase any men/women that do? '}
-                  <span style={{color: '#f44336'}}>Make them laugh</span>
-                </p>
+
         
                 <div style={{ padding: '0px 36px 24px 36px' }}>
         
@@ -675,16 +674,7 @@ export default class Sheet extends React.Component {
                       centerToggle text={'c. had or been advised by a member of the medical profession to have Kidney Dialysis or Cirrhosis? '} />
                   </div>
         
-                  {/* <p style={{ paddingLeft: '8px' }}>{'4. Has the Proposed Insured ever:'}</p>
-                  <div style={{ paddingLeft: '32px', paddingBottom: '38px' }}>
-                    <QuestionBool
-                      field="q4a"
-                      value={this.state.q4a}
-                      onChange={this.updateStrAnswer} 
-                      centerToggle text={'a. been diagnosed with Acquired Immunodeficiency Syndrome (AIDS) or Aids-related Complex (ARC) by a medical professional; or Human Immuniodeficiency Virus (HIV)?'} />
-                  </div> */}
 
-                  {/* <QuestionBool field="q5a" value={this.state.q5a} onChange={this.updateStrAnswer} centerToggle text={'5. Has the Proposed Insured ever been diagnosed or received treatment by a member of the medical profession for Alzheimer’s disease, dementia, Lou Gehrig’s/Amyotrophic Lateral Sclerosis (ALS).'} /> */}
                   <QuestionBool field="q4" value={this.state.q4} onChange={this.updateStrAnswer} centerToggle text={'4. Has the Proposed Insured ever been diagnosed by a member of the medical profession with more than one occurrence of the same or different type of cancer or is the Proposed Insured currently receiving treatment (including taking medication) for any form of cancer (excluding basal cell skin cancer)?'} />
                   <QuestionBool field="q5" value={this.state.q5} onChange={this.updateStrAnswer} centerToggle text={'5. Is the insurance applied for intended to replace or change any life insurance, long term care insurance or annuity contract in force with this or any other company?'} />
         
@@ -849,10 +839,11 @@ export default class Sheet extends React.Component {
                 <div style={{ display: 'flex', justifyContent:'center', marginBottom: '36px'}}>
                   <IconButton
                     color="blue"
+                    style={{ width: '180px' }}
                     onClick={() => { window.open('http://fexquotes.com/wqt/v1/webrate.pl?id=5554&fn=1&vrt=m&tgt=1&cpn=0&style=coolmint', '_blank', 'width=500,height=500,toolbar=no') }}
                     icon={<Icon icon="calculator" />}
                     >
-                    Embed FEXQuoter
+                    FEXQuoter
                     </IconButton>
                 </div>
 
