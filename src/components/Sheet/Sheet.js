@@ -5,7 +5,7 @@ import { Checkbox, CheckboxGroup, Divider, Icon, IconButton, Input, InputGroup, 
 import Swal from 'sweetalert2';
 import urljoin from 'url-join';
 import { benefitDates, carriers, data, diseases, initialDraftDates, laborStatusOptions, diagnosisData } from '../../data';
-import { baseUrl, dev } from '../../utils';
+import { baseUrl, calculateAge, dev } from '../../utils';
 import Annotation from '../Annotation/Annotation';
 import Card from '../Card/Card';
 import { QuestionBool, QuestionPicker, QuestionStr, QuestionTwoFields } from '../Question/Question';
@@ -17,10 +17,10 @@ const Strong = ({ text, customStyles }) => {
 return <span style={{  color: '#3498ff', fontSize: '20px', fontWeight: 500, ...customStyles }}>{text}</span>
 }
 
-const CustomInput = ({  className = '', label, value, field, onChange, small = false }) => (
+const CustomInput = ({  className = '', label, value, field, onChange, small = false, type='' }) => (
   <div className={className} style={{ width: '100%' }}>
     <small>{label}:</small>
-    <Input size={small ? 'sm' : 'md'} value={value} onChange={(val) => onChange(val, field)}/>
+    <Input size={small ? 'sm' : 'md'} type={type} value={value} onChange={(val) => onChange(val, field)}/>
   </div>
 )
 
@@ -139,20 +139,20 @@ export default class Sheet extends React.Component {
         { ref: 'conversionCheckPointRef', value: 6, label: 'Conversion Checkpoint' },
         { ref: 'quotesRef',               value: 7, label: 'Quotes ' },
         { ref: 'applicationSectionRef',   value: 8, label: 'Application Section' },
-        { ref: 'bankingRef',              value: 9, label: 'Banking ' },
-        { ref: 'objectionsRef',           value: 10, label: 'Objections' },
+        // { ref: 'bankingRef',              value: 9, label: 'Banking ' },
+        // { ref: 'objectionsRef',           value: 10, label: 'Objections' },
         { ref: 'buttonsUpRef',            value: 11, label: 'Button Up ' },
         { ref: 'vipsRef',                 value: 12, label: 'VIPS ' },
         { ref: 'submitRef',               value: 13, label: 'Submit ' },
 
       ],
-      selectedQuote: null,
+      selectedQuote: 1,
       alert: {
         showCancelButton: true,
       },
       diseases,
       agent: 0,
-      monthlyPremium: 0,
+      age: 0,
     }
 
     this.openingRef      = React.createRef();
@@ -234,10 +234,14 @@ export default class Sheet extends React.Component {
 
       if (request.status === 200) {
 
+        const birthDate = json.birthDate ? json.birthDate : undefined;
+        const age = calculateAge(new Date(birthDate));
+
         this.setState({
           ...json,
           isLoading: false,
-          fullName: `${json.firstName} ${json.lastName}`
+          fullName: `${json.firstName} ${json.lastName}`,
+          age
         })
 
       } else {
@@ -299,8 +303,12 @@ export default class Sheet extends React.Component {
     const findCarrier = this.state.carriers.find(e => e.value === this.state.selectedCarrier);
     const selectedCarrier = findCarrier ? findCarrier : {};
 
-    const currentBenefitDate = this.state.benefitDate ? this.state.benefitDates.find(e => this.state.benefitDate === e.value).label : '<Benefit Date>';
-  
+    
+    const selectedQuote = this.state.selectedQuote;
+    const quote = this.state.quotes.find(e => e.value === selectedQuote);
+    const { costPerMonth, faceAmount } = quote;
+
+  console.log('re render', costPerMonth, faceAmount)
   
     return (
       <div style={{ position: 'relative' }}>
@@ -313,17 +321,27 @@ export default class Sheet extends React.Component {
               <CustomInput className={styles.firstName}   small field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
               <CustomInput className={styles.lastName}    small field="lastName"  label="Last Name"  onChange={this.updateStrAnswer} value={this.state.lastName}  />
               <CustomInput className={styles.birthDate}   small field="birthDate" label="Birth Date" onChange={this.updateStrAnswer} value={this.state.birthDate} />
+              <CustomInput className={styles.age}         small field="age" label="Age" onChange={this.updateStrAnswer} value={this.state.age} />
               <CustomInput className={styles.email}       small field="email"     label="Email"      onChange={this.updateStrAnswer} value={this.state.email}     />
               <CustomInput className={styles.phone}       small field="phone"     label="Phone"      onChange={this.updateStrAnswer} value={this.state.phone}     />
               <CustomInput className={styles.state}       small field="state"     label="State"      onChange={this.updateStrAnswer} value={this.state.state}     />
+              <CustomInput className={styles.city}       small field="city"     label="City"      onChange={this.updateStrAnswer} value={this.state.city}     />
               <CustomInput className={styles.zip}         small field="zip"       label="Zip"        onChange={this.updateStrAnswer} value={this.state.zip}       />
               <CustomInput className={styles.address}     small field="address"   label="Address"    onChange={this.updateStrAnswer} value={this.state.address}   />
               <CustomInput className={styles.height}      small field="height"    label="Height"     onChange={this.updateStrAnswer} value={this.state.height}    />
 
               <CustomInput className={styles.weight}      small field="weight"         label="Weight"      onChange={this.updateStrAnswer} value={this.state.weight}      />
               <CustomInput className={styles.beneficiary} small field="beneficiary"    label="Beneficiary" onChange={this.updateStrAnswer} value={this.state.beneficiary} />
-              <CustomInput className={styles.faceAmmount} small field="faceAmmount"    label="Face Amount" onChange={this.updateStrAnswer} value={this.state.faceAmmount} />
-              <CustomInput className={styles.monthlyPremium} small field="monthlyPremium" label="Monthly Premium" onChange={this.updateStrAnswer} value={this.state.monthlyPremium} />
+              <CustomInput 
+                className={styles.faceAmmount} small type="number"
+                value={faceAmount} field="faceAmount" label="Face Amount" 
+                onChange={(val, field) => this.updateQuoteField(selectedQuote, val, field)} 
+                />
+              <CustomInput 
+                className={styles.monthlyPremium} small type="number"
+                field="costPerMonth" label="Monthly Premium" value={costPerMonth} 
+                onChange={(val, field) => this.updateQuoteField(selectedQuote, val, field)} 
+                />
 
               <QuestionPicker
                 vertical small
@@ -367,7 +385,7 @@ export default class Sheet extends React.Component {
 
               <div className={styles.SubmitButton}>
                 <IconButton 
-                  style={{ width: '160px', fontWeight:'500' }}
+                  style={{ width: '100%', fontWeight:'500' }}
                   color="blue"
                   placement="right"
                   onClick={this.submitData}
@@ -600,15 +618,35 @@ export default class Sheet extends React.Component {
                 <div className={styles.ContainerTable}>
                   <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr', paddingLeft:'32px' }}>
                     { 
-                      diagnosisData.data.map(row => (
-                        <Checkbox className={styles.CH} checked={this.state.selectedDiseases.some(sd => sd === row.value)} value={row.value}>
-                          <div className={styles.RowT} style={{ display: 'flex', ...row.style }}>
-                            { 
-                              diagnosisData.fields.map(f => (<div style={{ width: f.width, ...f.style, ...row.fStyle }} >{ row[f.value] }</div>))
-                            }
-                          </div>
-                        </Checkbox>
-                      ))
+                      diagnosisData.data.map(row => {
+
+                        if (!row.value) {
+                          return (
+                            <div 
+                              className={`${styles.RowT} ${styles.RowHeader}`} 
+                              style={{ ...row.rowStyle }}
+                              >
+                              { 
+                                diagnosisData.fields.map(f => (
+                                  <div className={styles.VerticalCenter} style={{ width: f.width, ...f.style, ...row.fStyle, ...(row.style ? row.style[f.value] : {}) }}>
+                                    { row[f.value] }
+                                  </div>
+                                ))
+                              }
+                            </div>
+                          )
+                        }
+                        
+                        return (
+                          <Checkbox className={styles.CH} style={{ ...row.style }} checked={this.state.selectedDiseases.some(sd => sd === row.value)} value={row.value}>
+                            <div className={styles.RowT} style={{ display: 'flex'}}>
+                              { 
+                                diagnosisData.fields.map(f => (<div style={{ width: f.width, ...f.style, ...row.fStyle, ...(row.style ? row.style[f.value] : {}) }} >{ row[f.value] }</div>))
+                              }
+                            </div>
+                          </Checkbox>
+                        )
+                      })
                     }
 
                   </CheckboxGroup>
@@ -852,7 +890,7 @@ export default class Sheet extends React.Component {
                   <div style={{ display: 'grid', gridTemplateColumns: '48px 160px 160px', alignItems: 'center', columnGap: '8px', justifyContent: 'center' }}>
                     <small style={{ textAlign: 'center' }} >Option</small>
                     <small style={{ textAlign: 'center' }} >Face Amount</small>
-                    <small style={{ textAlign: 'center' }} >Cost per Month</small>
+                    <small style={{ textAlign: 'center' }} >Monthly Premium</small>
                   </div>
                   <div style={{ display: 'grid', gridAutoRows: 'max-content', rowGap: '4px', gridTemplateColumns: 'max-content' }}>
                     {
@@ -1018,7 +1056,7 @@ export default class Sheet extends React.Component {
         
 
 
-                <Annotation text="ASKING FOR THE MONEY" customStyles={{fontSize: '20px', margin:'48px 0'}}/>
+                {/* <Annotation text="ASKING FOR THE MONEY" customStyles={{fontSize: '20px', margin:'48px 0'}}/>
 
 
                 <QuestionBool 
@@ -1067,10 +1105,10 @@ export default class Sheet extends React.Component {
                     {' And we’ll set up your future payments to always come out the exact same way. Our system coincides with Social Security. Isn’t that great?'}
                   </span>
                   </p>
-                </Panel>
+                </Panel> */}
 
                 
-                <div ref={this.bankingRef}></div>
+                {/* <div ref={this.bankingRef}></div>
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="BANKING"/>
                 <Annotation customStyles={{fontSize: '18px', margin:'12px 0px 36px 0'}} text="Talk Slow and Confident. Be sure to write everything down."/>
 
@@ -1091,11 +1129,11 @@ export default class Sheet extends React.Component {
                     field="clientOwnsTheAccount"
                     onChange={this.updateStrAnswer}
                   />
-                </div>
+                </div> */}
 
 
 
-                <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="CHECKING ACCOUNT"/>
+                {/* <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="CHECKING ACCOUNT"/>
                 <Annotation customStyles={{fontSize: '18px', margin:'12px 0px 36px 0'}} text="(Check Google for Bank’s ROUTING #)"/>
 
                 <p>
@@ -1154,7 +1192,7 @@ export default class Sheet extends React.Component {
                   <p>
                     {'Don’t worry, we have a very secure system in place, your numbers are encrypted so I won’t be able to see your banking information, it gets covered up with X’s on my screen, go ahead, I’m ready whenever you are.'}
                   </p>
-                </Panel>
+                </Panel> */}
 
                 <QuestionStr 
                     text="Copy and Paste Bettercheck Results:"
@@ -1165,7 +1203,7 @@ export default class Sheet extends React.Component {
                 
 
 
-                <div ref={this.objectionsRef}></div>
+                {/* <div ref={this.objectionsRef}></div>
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Objections"/>
 
                 <Panel header={<span style={{ color: '#f44336' }}>Budget</span>} collapsible bordered>
@@ -1226,7 +1264,7 @@ export default class Sheet extends React.Component {
                       <Timeline.Item>That's OK, go ahead.</Timeline.Item>
                     </Timeline>
                   </p>
-                </Panel>
+                </Panel> */}
 
 
 
@@ -1236,11 +1274,11 @@ export default class Sheet extends React.Component {
                 <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Button Up"/>
         
         
-                <p>Awesome {<Strong text={clientName}/>} WE’RE GOOD, you should be getting a welcome packet in the mail in a few weeks.</p>
+                {/* <p>Awesome {<Strong text={clientName}/>} WE’RE GOOD, you should be getting a welcome packet in the mail in a few weeks.</p> */}
                 <p>{<Strong text={clientName}/>} how do you feel about the coverage you put in place today? (Wait for Response) </p>
                 <p>I just want to tell you, you’re awesome for protecting <Strong text={beneficiary}/>. </p>
-                <p>I’m really curious {<Strong text={clientName}/>} what was the driving force behind your wise decision today? (Wait for Response) </p>
-                <p>Wow, thank you for sharing that with me {<Strong text={clientName}/>}, we’re committed to making sure the money will be readily available for <Strong text={beneficiary}/>. </p>
+                {/* <p>I’m really curious {<Strong text={clientName}/>} what was the driving force behind your wise decision today? (Wait for Response) </p> */}
+                {/* <p>Wow, thank you for sharing that with me {<Strong text={clientName}/>}, we’re committed to making sure the money will be readily available for <Strong text={beneficiary}/>. </p> */}
                 <p>Likewise, I know you’re committed to making sure you have the funds available for your bank to make the monthly premiums. </p>
                 <p>In other words, you can count on us and we can count on you, isn’t that right, {<Strong text={clientName}/>}? </p>
                 <p>It’s my job to make sure you’re aware of every little detail, so real quick, I want you to be mindful that sometimes it can take a few days from your benefit date for your bank to make the premium payment for you, mostly when it falls on weekends or holidays., </p>
@@ -1387,13 +1425,13 @@ export default class Sheet extends React.Component {
       agent,
     } = this.state;
 
-    const laborStatus      = this.state.laborStatusOptions.find(e => e.value === selectedLaborStatus) ?? null;
-    const paymentType      = this.state.paymentTypeOptions.find(e => e.value === selectedPaymentType) ?? null;
-    const healthConditions = this.state.diseases.filter(e => selectedDiseases.some(x => x === e.value)) ?? null;
-    const carrier          = this.state.carriers.find(e => e.value === selectedCarrier) ?? null;
-    const quote            = this.state.quotes.find(e => e.value === selectedQuote) ?? null;
-    const benefitDate      = this.state.benefitDates.find(e => e.value === selectedBenefitDate) ?? null;
-    const initialDraftDate = this.state.initialDraftDates.find(e => e.value === selectedInitialDraftDate) ?? null;
+    const laborStatus      = this.state.laborStatusOptions.find(e => e.value === selectedLaborStatus)     ?? {label: "", value: 0};
+    const paymentType      = this.state.paymentTypeOptions.find(e => e.value === selectedPaymentType)     ?? {label: "", value: 0};
+    const healthConditions = this.state.diseases.filter(e => selectedDiseases.some(x => x === e.value))   ?? [{value: 0, label: ""}];
+    const carrier          = this.state.carriers.find(e => e.value === selectedCarrier)                   ?? { label: "", value: "" };
+    const quote            = this.state.quotes.find(e => e.value === selectedQuote)                       ?? null;
+    const benefitDate      = this.state.benefitDates.find(e => e.value === selectedBenefitDate)           ?? { value: 0, label: "" };
+    const initialDraftDate = this.state.initialDraftDates.find(e => e.value === selectedInitialDraftDate) ?? {value: 0, label: ""};
 
     return JSON.stringify({
       laborStatus,
@@ -1556,6 +1594,22 @@ export default class Sheet extends React.Component {
       quotes: this.state.quotes.map((e, i) => {
 
         if (i === index) return { ...e, [field]: value }
+
+        return e;
+
+      })
+    })
+
+  }
+
+  updateQuoteField = async (id, value, field) => {
+
+    console.log(id, field, value);
+
+    await this.setState({
+      quotes: this.state.quotes.map((e, i) => {
+
+        if (e.value === id) return { ...e, [field]: value }
 
         return e;
 

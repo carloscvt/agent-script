@@ -115,3 +115,12 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+
+.rs-picker-has-value .rs-btn .rs-picker-toggle-value, .rs-picker-has-value .rs-picker-toggle .rs-picker-toggle-value {
+  font-size: 14px;
+}
+
+.rs-picker-toggle .rs-picker-toggle-placeholder {
+  font-size: 14px;
+}

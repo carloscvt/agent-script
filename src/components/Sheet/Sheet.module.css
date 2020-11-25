@@ -73,18 +73,35 @@
 }
 
 .FloatContainer {
-  background: white; height: 248px; box-shadow: 0 4px 4px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.06);
+  background: white; 
+  height: 190px; box-shadow: 0 4px 4px rgba(0, 0, 0, 0.12), 0 0 10px rgba(0, 0, 0, 0.06);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 2;
-  padding: 20px 24px;
+  padding: 12px 24px;
+}
+
+.FloatContainer::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,.0);
+}
+.FloatContainer::-webkit-scrollbar {
+  width: 6px;
+  height: 8px;
+  background-color: transparent;
+}
+.FloatContainer::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.18);
+  background-color: rgba(22, 117, 224, 0.35);
+  border-width: 1px;
+  border-radius: 24px;
 }
 
 .Content {
   overflow: scroll;
-  top: 248px;
+  top: 190px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -172,6 +189,12 @@
 .benefitDate {
   grid-area: benefitDate;
 }
+.age {
+  grid-area: age;
+}
+.city {
+  grid-area: city;
+}
 
 .haveLifeInsurance {
   grid-area: haveLifeInsurance;
@@ -197,10 +220,11 @@
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   column-gap: 6px;
+  row-gap: 2px;
   grid-template-areas: 
-  "firstName firstName lastName lastName birthDate birthDate email email phone phone state zip"
-  "address address height weight beneficiary beneficiary faceAmmount faceAmmount monthlyPremium monthlyPremium laborStatus laborStatus"
-  "initialDraftDate initialDraftDate benefitDate benefitDate haveLifeInsurance haveLifeInsurance smoked submitButton . . . ."
+  "firstName firstName lastName lastName birthDate birthDate age email email email phone phone"
+  "state city zip address address height weight beneficiary beneficiary faceAmmount faceAmmount monthlyPremium "
+  "laborStatus laborStatus initialDraftDate initialDraftDate benefitDate benefitDate haveLifeInsurance haveLifeInsurance smoked submitButton . . "
   ;
 }
 
@@ -209,7 +233,7 @@
 
 .RowT {
   /* border-bottom: 1px solid #EEEEEE; */
-  padding: 8px 12px;
+  /* padding: 8px 12px; */
 }
 
 .ContainerTable {
@@ -219,9 +243,56 @@
 
 .CH {
   border-bottom: 1px solid #EEEEEE;
+  border-left: 1px solid #EEEEEE;
+  border-right: 1px solid #EEEEEE;
 }
 
 .CH .rs-checkbox-checker {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
+}
+
+.Row > div {
+  border-left: 1px solid #eeeeee;
+}
+
+.CH:hover {
+  background: rgba(33, 150, 243, 0.09);
+}
+
+.VerticalCenter {
+  display: flex;
+  align-items: center;
+}
+
+.RowHeader {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 36px;
+  min-height: 36px;
+  line-height: 1;
+  position: relative;
+  display: flex; 
+  padding-left: 36px;
+  border-bottom: 1px solid #EEEEEE;
+  border-left: 1px solid #EEEEEE;
+  border-right: 1px solid #EEEEEE;
+}
+
+.RowHeader:nth-child(1) {
+  border-top: 1px solid #EEEEEE;
+  background: #2196f31c;
+}
+
+.RowHeader:nth-child(1) > * {
+  font-size: 18px !important;
+  color: #1675e0 !important;
+}
+
+
+@media(max-width: 1320px) {
+  .ContainerFixedFields {
+    /* margin-left: 12px; */
+    margin-right: 48px;
+  }
 }

@@ -151,11 +151,20 @@ export const diagnosisData = {
     { value: 'col3', label: '', width: '200px'                },
   ],
   data: [
-    { value: 1, col1: 'Impairment/Diagnosis',  col2: 'Prosperity Life',  col3: 'Aetna / Accendo / CVS Health' },
-    { value: 2, col1: '',                      col2: 'Whole Life-50-80', col3: 'Whole Life 40-89' },
-    { value: 3, col1: '',                      col2: 'Mod 50-80 2yr',    col3: 'Mod ONLY 40 to 75' },
-    { value: 4, col1: 'Face Amounts',          col2: '$1500 - $35k',     col3: '$2k - $50k (age)' },
-    { value: 5, col1: 'FOR AGENT USE ONLY',    col2: '',                 col3: '', style: { background: '#f44336' }, fStyle: { color: 'white' } },
+    { 
+      col1: 'Impairment/Diagnosis',  
+      col2: 'Prosperity Life',  
+      col3: 'Aetna / Accendo / CVS Health', 
+      style: { 
+        col1: { fontSize: '18px' }, 
+        col2: { color: '#2196f3', fontWeight: '500', fontSize: '18px' }, 
+        col3: {  fontWeight: '500', fontSize: '18px', textAlign: 'center' }, 
+      } 
+    },
+    { col1: '',                      col2: 'Whole Life-50-80', col3: 'Whole Life 40-89' },
+    { col1: '',                      col2: 'Mod 50-80 2yr',    col3: 'Mod ONLY 40 to 75' },
+    { col1: 'Face Amounts',          col2: '$1500 - $35k',     col3: '$2k - $50k (age)' },
+    { col1: 'FOR AGENT USE ONLY',    col2: '',                 col3: '', rowStyle: { background: '#78909c' }, fStyle: { color: 'white' } },
     { value: 6, col1: 'ALCOHOL or DRUG ISSUE',                                 col2: '',                     col3: '' },
     { value: 7, col1: 'Under 3 years but over 2 years since last treatment',   col2: 'Preferred',            col3: 'Modified' },
     { value: 8, col1: 'Under 2 years but over 1 year',                         col2: 'Modified',             col3: 'Modified' },
