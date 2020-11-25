@@ -153,6 +153,7 @@ export default class Sheet extends React.Component {
       diseases,
       agent: 0,
       age: 0,
+      selectedDiagnosis: [],
     }
 
     this.openingRef      = React.createRef();
@@ -314,7 +315,7 @@ export default class Sheet extends React.Component {
       <div style={{ position: 'relative' }}>
 
         <div className={styles.FloatContainer}>
-          <div style={{ display:'flex', flexWrap: 'wrap', maxWidth: '1280px', margin: '0 auto', justifyContent:'center' }}>
+          <div style={{ display:'flex', flexWrap: 'wrap', width: '1280px', margin: '0 auto', justifyContent:'center' }}>
 
 
             <div className={styles.ContainerFixedFields}>
@@ -616,7 +617,7 @@ export default class Sheet extends React.Component {
                 <Annotation customStyles={{ textAlign: 'center' }} text="IF no to above: Continue to Determine Level, Modified or Graded " />
 
                 <div className={styles.ContainerTable}>
-                  <CheckboxGroup onChange={selectedDiseases =>  this.setState({ selectedDiseases })} style={{ display: 'grid', gridTemplateColumns: '1fr', paddingLeft:'32px' }}>
+                  <CheckboxGroup onChange={selectedDiagnosis =>  this.setState({ selectedDiagnosis })} style={{ display: 'grid', gridTemplateColumns: '1fr', paddingLeft:'32px' }}>
                     { 
                       diagnosisData.data.map(row => {
 
@@ -1425,13 +1426,18 @@ export default class Sheet extends React.Component {
       agent,
     } = this.state;
 
+
+    const diagnosticOptions = [...this.state.diseases, ...diagnosisData.data.map(x => ({ label: x.col1, value: x.value }))];
+    const selectedDiagnostics = [...this.state.selectedDiagnosis, ...this.state.selectedDiseases];
+
     const laborStatus      = this.state.laborStatusOptions.find(e => e.value === selectedLaborStatus)     ?? {label: "", value: 0};
     const paymentType      = this.state.paymentTypeOptions.find(e => e.value === selectedPaymentType)     ?? {label: "", value: 0};
-    const healthConditions = this.state.diseases.filter(e => selectedDiseases.some(x => x === e.value))   ?? [{value: 0, label: ""}];
+    const healthConditions = diagnosticOptions.filter(e => selectedDiagnostics.some(x => x === e.value))  ?? [{value: 0, label: ""}];
     const carrier          = this.state.carriers.find(e => e.value === selectedCarrier)                   ?? { label: "", value: "" };
     const quote            = this.state.quotes.find(e => e.value === selectedQuote)                       ?? null;
     const benefitDate      = this.state.benefitDates.find(e => e.value === selectedBenefitDate)           ?? { value: 0, label: "" };
     const initialDraftDate = this.state.initialDraftDates.find(e => e.value === selectedInitialDraftDate) ?? {value: 0, label: ""};
+
 
     return JSON.stringify({
       laborStatus,
@@ -1499,11 +1505,11 @@ export default class Sheet extends React.Component {
           
           const body = this.generatePayload();
 
-          const url = urljoin(baseUrl, `${this.state.recordID}`);
+          const url     = urljoin(baseUrl, `${this.state.recordID}`);
           const headers = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
       
           const request = await fetch(url, { headers, method: 'POST', body});
-          const json = await request.json();
+          const json    = await request.json();
 
           if (request.status === 200) {
             console.log(json);
@@ -1513,6 +1519,8 @@ export default class Sheet extends React.Component {
         
   
         } catch (error) {
+
+          console.log(error)
 
           Swal.fire({
             title: 'An error has occurred',
@@ -1603,8 +1611,6 @@ export default class Sheet extends React.Component {
   }
 
   updateQuoteField = async (id, value, field) => {
-
-    console.log(id, field, value);
 
     await this.setState({
       quotes: this.state.quotes.map((e, i) => {
