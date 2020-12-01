@@ -683,7 +683,7 @@ export default class Sheet extends React.Component {
         
 
         
-                  <QuestionBool
+                  {/* <QuestionBool
                     field="q1"
                     value={this.state.q1}
                     onChange={this.updateStrAnswer}
@@ -717,7 +717,7 @@ export default class Sheet extends React.Component {
                   <QuestionBool field="q4" value={this.state.q4} onChange={this.updateStrAnswer} centerToggle text={'4. Has the Proposed Insured ever been diagnosed by a member of the medical profession with more than one occurrence of the same or different type of cancer or is the Proposed Insured currently receiving treatment (including taking medication) for any form of cancer (excluding basal cell skin cancer)?'} />
                   <QuestionBool field="q5" value={this.state.q5} onChange={this.updateStrAnswer} centerToggle text={'5. Is the insurance applied for intended to replace or change any life insurance, long term care insurance or annuity contract in force with this or any other company?'} />
         
-                  <Annotation customStyles={{ marginTop: '32px' }} text={'If any question above is answered, “yes,” write policy through Great Western Insurance Company'} />
+                  <Annotation customStyles={{ marginTop: '32px' }} text={'If any question above is answered, “yes,” write policy through Great Western Insurance Company'} /> */}
                   <Annotation customStyles={{ marginTop: '40px', marginBottom: '0px' }} text={'[IF REPLACING A POLICY AND THEY QUALIFY USE AETNA]'} />
         
                 </div>
