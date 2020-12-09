@@ -136,13 +136,12 @@ export default class Sheet extends React.Component {
         { ref: 'qualifyRef',              value: 3, label: 'Qualify' },
         { ref: 'verificationRef',         value: 4, label: 'Verification ' },
         { ref: 'setTheStageRef',          value: 5, label: 'Set the Stage' },
-        { ref: 'conversionCheckPointRef', value: 6, label: 'Conversion Checkpoint' },
         { ref: 'quotesRef',               value: 7, label: 'Quotes ' },
+        { ref: 'conversionCheckPointRef', value: 6, label: 'Conversion Checkpoint' },
         { ref: 'applicationSectionRef',   value: 8, label: 'Application Section' },
         // { ref: 'bankingRef',              value: 9, label: 'Banking ' },
         // { ref: 'objectionsRef',           value: 10, label: 'Objections' },
-        { ref: 'buttonsUpRef',            value: 11, label: 'Button Up ' },
-        { ref: 'vipsRef',                 value: 12, label: 'VIPS ' },
+        { ref: 'vipsRef',                 value: 12, label: 'Referrals ' },
         { ref: 'submitRef',               value: 13, label: 'Submit ' },
 
       ],
@@ -154,6 +153,8 @@ export default class Sheet extends React.Component {
       agent: 0,
       age: 0,
       selectedDiagnosis: [],
+      ssn: '',
+      medicationsNotes: ''
     }
 
     this.openingRef      = React.createRef();
@@ -308,8 +309,6 @@ export default class Sheet extends React.Component {
     const selectedQuote = this.state.selectedQuote;
     const quote = this.state.quotes.find(e => e.value === selectedQuote);
     const { costPerMonth, faceAmount } = quote;
-
-  console.log('re render', costPerMonth, faceAmount)
   
     return (
       <div style={{ position: 'relative' }}>
@@ -344,14 +343,7 @@ export default class Sheet extends React.Component {
                 onChange={(val, field) => this.updateQuoteField(selectedQuote, val, field)} 
                 />
 
-              <QuestionPicker
-                vertical small
-                text="Labor Status:"
-                opts={this.state.laborStatusOptions}
-                value={this.state.laborStatus}
-                field="laborStatus" className={styles.laborStatus}
-                onChange={this.updateStrAnswer}
-                />
+              <CustomInput className={styles.laborStatus} small field="ssn"     label="SSN"      onChange={this.updateStrAnswer} value={this.state.ssn}     />
 
               <QuestionPicker
                 vertical small
@@ -539,28 +531,6 @@ export default class Sheet extends React.Component {
                         onChange={this.updateStrAnswer}
                         />
 
-
-
-                      <QuestionPicker
-                        text="Are you currently employed, retired, or on social security disability?"
-                        opts={this.state.laborStatusOptions}
-                        value={this.state.laborStatus}
-                        field="laborStatus"
-                        onChange={this.updateStrAnswer}
-                        />
-        
-        
-                      <Annotation customStyles={{ textAlign: 'left', marginTop: '36px' }} text="If they are no longer working, ask:"/>
-        
-                      <div style={{ paddingLeft: '32px' }}>
-                        <QuestionPicker
-                          text="Does your payment go to the mailbox, to the bank, or on one of those green Direct Express cards?"
-                          opts={this.state.paymentTypeOptions}
-                          value={this.state.paymentType}
-                          field="paymentType"
-                          onChange={this.updateStrAnswer}
-                          />
-                      </div>
         
                     </div>
         
@@ -594,10 +564,6 @@ export default class Sheet extends React.Component {
                   onChange={this.updateStrAnswer}
                   />
 
-                <p>
-                  {'Do you smoke or chew, or chase any men/women that do? '}
-                  <span style={{color: '#f44336'}}>(ICEBREAKER)</span>
-                </p>
         
                 <Divider/>
                 <p>
@@ -613,6 +579,13 @@ export default class Sheet extends React.Component {
                     <Checkbox checked={this.state.selectedDiseases.some(sd => sd === e.value)} value={e.value}>{e.label}</Checkbox>
                   ))}
                 </CheckboxGroup>
+
+
+                <div style={{ padding: '48px 32px' }} >
+                  <small>Medications/Notes</small>
+                  <Input value={this.state.medicationsNotes} onChange={e => this.setState({ medicationsNotes: e })} rows={5} name="textarea" componentClass="textarea"/>
+                </div>
+
         
                 <Annotation customStyles={{ textAlign: 'center' }} text="IF no to above: Continue to Determine Level, Modified or Graded " />
 
@@ -682,42 +655,6 @@ export default class Sheet extends React.Component {
                     />
         
 
-        
-                  {/* <QuestionBool
-                    field="q1"
-                    value={this.state.q1}
-                    onChange={this.updateStrAnswer}
-                    centerToggle text={'1. Is the Proposed Insured currently or in the last 30 days been: hospitalized, committed to a psychiatric facility, confined to a nursing facility, receiving hospice or home health care, confined to a wheelchair due to a disease, or waiting for an organ transplant?'} />
-                  <QuestionBool
-                    field="q2"
-                    value={this.state.q2}
-                    onChange={this.updateStrAnswer}
-                    centerToggle text={'2. Does the Proposed Insured currently require human assistance or supervision with eating, dressing, toileting, transferring from bed to chair, walking, maintaining continence or bathing?'} />
-        
-                  <p style={{ paddingLeft: '8px' }}>{'3. Within the past 12 months has the Proposed Insured:'}</p>
-                  <div style={{ paddingLeft: '32px', paddingBottom: '38px' }}>
-                    <QuestionBool 
-                      field="q3a"
-                      value={this.state.q3a}
-                      onChange={this.updateStrAnswer}
-                      centerToggle text={'a. been advised by a member of the medical profession to have a diagnostic test (other than an HIV test), surgery, home health care or hospitalization which has not yet started, been completed or for which results are not known?'} />
-                    <QuestionBool 
-                      field="q3b"
-                      value={this.state.q3b}
-                      onChange={this.updateStrAnswer}
-                      centerToggle text={'b. used or been advised by a member of the medical profession to use oxygen equipment for assistance in breathing (excluding CPAP or nebulizer)? '} />
-                    <QuestionBool 
-                      field="q3c"
-                      value={this.state.q3c}
-                      onChange={this.updateStrAnswer}
-                      centerToggle text={'c. had or been advised by a member of the medical profession to have Kidney Dialysis or Cirrhosis? '} />
-                  </div>
-        
-
-                  <QuestionBool field="q4" value={this.state.q4} onChange={this.updateStrAnswer} centerToggle text={'4. Has the Proposed Insured ever been diagnosed by a member of the medical profession with more than one occurrence of the same or different type of cancer or is the Proposed Insured currently receiving treatment (including taking medication) for any form of cancer (excluding basal cell skin cancer)?'} />
-                  <QuestionBool field="q5" value={this.state.q5} onChange={this.updateStrAnswer} centerToggle text={'5. Is the insurance applied for intended to replace or change any life insurance, long term care insurance or annuity contract in force with this or any other company?'} />
-        
-                  <Annotation customStyles={{ marginTop: '32px' }} text={'If any question above is answered, “yes,” write policy through Great Western Insurance Company'} /> */}
                   <Annotation customStyles={{ marginTop: '40px', marginBottom: '0px' }} text={'[IF REPLACING A POLICY AND THEY QUALIFY USE AETNA]'} />
         
                 </div>
@@ -730,7 +667,6 @@ export default class Sheet extends React.Component {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr', marginBottom: '24px'}}>
                     <div className={styles.ContainerFullName}>
                       <span>Your full name is:</span>
-                      {/* <QuestionStr field="fullName" value={this.state.fullName} onChange={this.updateStrAnswer} text="Your full name is:"/> */}
                       <CustomInput field="firstName" label="First Name" onChange={this.updateStrAnswer} value={this.state.firstName} />
                       <CustomInput field="lastName" label="Last Name" onChange={this.updateStrAnswer} value={this.state.lastName} />
                     </div>
@@ -773,80 +709,8 @@ export default class Sheet extends React.Component {
                 <p>
                   {'Thank you for your patience while I pull this up for you.'}
                 </p>
-        
-                <div style={{ display: 'flex', flexDirection: 'column', width: '420px', margin: '36px auto 42px' }}>
-                  <small style={{ fontWeight: '500', color: '#3498ff', paddingLeft: '6px' }}>Carriers:</small>
-                  <InputPicker 
-                    defaultValue={this.state.selectedCarrier}
-                    value={this.state.selectedCarrier}
-                    cleanable={false} size="md"
-                    placeholder="Select a carrier"
-                    data={carriers}
-                    onSelect={selectedCarrier => this.setState({ selectedCarrier })}
-                    />
-                </div>
-        
-                <p>
-                  {'Okay, looks like '}
-                  <Strong text={selectedCarrier.label ? selectedCarrier.label : '<CARRIER>'} />
-                  {' might be the best option for you.  They’re located in '}
-                  <Strong text={selectedCarrier.address ? selectedCarrier.address : '<CARRIER LOCATION>'}/>
-                  {'.  Most importantly, '}
-                  <Strong text={selectedCarrier.label ? selectedCarrier.label : '<CARRIER>'}/>
-                  {' has an A Rating with the AM Best, so your family will be in great hands, ok -?-'}
-                  <span></span>
-                </p>
-        
-                <p>
-                  {'Great '}
-                  <Strong text={clientName}/>
-                  {', now, in my professional opinion, a whole life insurance plan is the best option to provide for your family the protection that they’re going to need. This will be with you for your whole life, it’ll leave '}
-                  <Strong text={beneficiary}/>
-                  {' with a guaranteed 100% tax free benefit upon your inevitable passing. This is what you want, isn’t it?'}
-                </p>
-                <p>
-                  {'Exactly, that’s why we’re on the phone today! Also, you may borrow against your policy in case of an emergency, you can think of it like how equity builds in a home.'}
-                </p>
-                <p>
-                  {' With this policy, your premiums will always be locked in, the death benefit will never decrease, and if we get you qualified today, you’ll be covered from day one, you’ll never be dropped or cancelled by the company, and lastly, it will stay with you, your whole life, which is what you want isn’t it?'}
-                </p>
-        
-                <p>
-                  {'Pretty awesome isn’t it?'}
-                </p>
-        
-                <p>
-                  {'I couldn’t agree more! '}
-                  <Strong text={clientName} />
-                  {', grab that pen and paper again, and let me know when you’re ready.'}
-                </p>
-        
-                <p>
-                  {'Great! My job is to make sure you’re 100% confident in the decision to move forward. Next to my name and license number, go ahead and write down my direct number _________.'}{/* and extension ____.'} */}
-                </p>
-        
-                <p>
-                  {'I’ll be your agent for life and I’m here for you every step of the way through the underwriting process.'}
-                </p>
-        
-              </Card>
-        
-        
-              </div>
-        
-              <br/>
-              <br/>  
-        
-              <Card customRef={this.conversionCheckPointRef}>
-        
-                <Annotation customStyles={{ textAlign: 'left' }} text="Conversion Checkpoint"/>
-        
-                <p>{'I know this is a lot of great information to take in, but do you have any questions before we check your eligibility to apply?'}</p>
-                <p>{'Now, we don’t take any chances on you getting sick and forgetting to mail in your payment because we had a client who took that chance, they got a terminal illness, and was no longer insurable.'}</p>
-                <p>{'Needless to say we don’t let our clients take that chance anymore, and I especially don\'t want that to happen to you. So, you have two easy options...you can either pay annually or monthly. And we simply set everything up with your bank just like your social security, ok?'}</p>
-                <p>{'Great! Now the insurance company is getting back with me, hold on and let me see what they’re saying here real quick.'}</p>
-        
-        
+
+
                 <Annotation customStyles={{ fontSize: '20px' }} text="THE CONGRATS"/>
         
                 <p>
@@ -937,6 +801,84 @@ export default class Sheet extends React.Component {
                 </p>
 
                 <br/>
+
+
+        
+                <div style={{ display: 'flex', flexDirection: 'column', width: '420px', margin: '36px auto 42px' }}>
+                  <small style={{ fontWeight: '500', color: '#3498ff', paddingLeft: '6px' }}>Carriers:</small>
+                  <InputPicker 
+                    defaultValue={this.state.selectedCarrier}
+                    value={this.state.selectedCarrier}
+                    cleanable={false} size="md"
+                    placeholder="Select a carrier"
+                    data={carriers}
+                    onSelect={selectedCarrier => this.setState({ selectedCarrier })}
+                    />
+                </div>
+        
+                <p>
+                  {'Okay, looks like '}
+                  <Strong text={selectedCarrier.label ? selectedCarrier.label : '<CARRIER>'} />
+                  {' might be the best option for you.  They’re located in '}
+                  <Strong text={selectedCarrier.address ? selectedCarrier.address : '<CARRIER LOCATION>'}/>
+                  {'.  Most importantly, '}
+                  <Strong text={selectedCarrier.label ? selectedCarrier.label : '<CARRIER>'}/>
+                  {' has an A Rating with the AM Best, so your family will be in great hands, ok -?-'}
+                  <span></span>
+                </p>
+        
+                <p>
+                  {'Great '}
+                  <Strong text={clientName}/>
+                  {', now, in my professional opinion, a whole life insurance plan is the best option to provide for your family the protection that they’re going to need. This will be with you for your whole life, it’ll leave '}
+                  <Strong text={beneficiary}/>
+                  {' with a guaranteed 100% tax free benefit upon your inevitable passing. This is what you want, isn’t it?'}
+                </p>
+                <p>
+                  {'Exactly, that’s why we’re on the phone today! Also, you may borrow against your policy in case of an emergency, you can think of it like how equity builds in a home.'}
+                </p>
+                <p>
+                  {' With this policy, your premiums will always be locked in, the death benefit will never decrease, and if we get you qualified today, you’ll be covered from day one, you’ll never be dropped or cancelled by the company, and lastly, it will stay with you, your whole life, which is what you want isn’t it?'}
+                </p>
+        
+                <p>
+                  {'Pretty awesome isn’t it?'}
+                </p>
+        
+                <p>
+                  {'I couldn’t agree more! '}
+                  <Strong text={clientName} />
+                  {', grab that pen and paper again, and let me know when you’re ready.'}
+                </p>
+        
+                <p>
+                  {'Great! My job is to make sure you’re 100% confident in the decision to move forward. Next to my name and license number, go ahead and write down my direct number _________.'}
+                  {/* {'Great! My job is to make sure you’re 100% confident in the decision to move forward. Next to my name and license number, go ahead and write down my phone number 855-657-0989 Extension ____'} */}
+                </p>
+        
+                <p>
+                  {'I’ll be your agent for life and I’m here for you every step of the way through the underwriting process.'}
+                </p>
+        
+              </Card>
+        
+        
+              </div>
+        
+              <br/>
+              <br/>  
+        
+              <Card customRef={this.conversionCheckPointRef}>
+        
+                <Annotation customStyles={{ textAlign: 'left' }} text="Conversion Checkpoint"/>
+        
+                <p>{'I know this is a lot of great information to take in, but do you have any questions before we check your eligibility to apply?'}</p>
+                <p>{'Now, we don’t take any chances on you getting sick and forgetting to mail in your payment because we had a client who took that chance, they got a terminal illness, and was no longer insurable.'}</p>
+                <p>{'Needless to say we don’t let our clients take that chance anymore, and I especially don\'t want that to happen to you. So, you have two easy options...you can either pay annually or monthly. And we simply set everything up with your bank just like your social security, ok?'}</p>
+                <p>{'Great! Now the insurance company is getting back with me, hold on and let me see what they’re saying here real quick.'}</p>
+        
+        
+
 
         
                 <Annotation customStyles={{fontSize: '20px'}} text="CLOSE"/>
@@ -1050,150 +992,7 @@ export default class Sheet extends React.Component {
                 </div>
 
 
-                {/* <p>
-                  <span style={{color: '#f44336'}}>If you truly followed this process & they don’t buy after this and they’re still on the phone with you, they don’t trust you so ask politely.</span>
-                  {' What’s really holding you back? I can text you a copy of my insurance license. Would that make you feel more comfortable?'}
-                </p> */}
-        
 
-
-                {/* <Annotation text="ASKING FOR THE MONEY" customStyles={{fontSize: '20px', margin:'48px 0'}}/>
-
-
-                <QuestionBool 
-                  field="startCoverageAsSoonAsPossible" 
-                  value={this.state.startCoverageAsSoonAsPossible} 
-                  onChange={this.updateStrAnswer} 
-                  centerToggle
-                  text={(
-                    <div>
-                      <span>Now <Strong text={clientName} />, most people start their coverage as soon as possible. Does that work for you?</span>
-                      <hr/>
-                      <span style={{color: '#f44336'}}>{'(IF NO>FUTURE PAYMENT CLOSE)'}</span>
-                    </div>
-                  )}
-                  />
-
-                <p>{'GREAT so your bank will send your first premium as soon as possible and all future payments will be on the same day you receive your social security. This is the only way to make sure your policy never lapses. This is AWESOME isn’t it? '}</p>
-
-                <QuestionPicker
-                  opts={this.state.benefitDates}
-                  value={this.state.benefitDate}
-                  text="Excellent, when do you receive your government benefits on, the 1st, 3rd, 2nd Wed, 3rd Wed or 4th Wed of the month?"
-                  onChange={this.updateStrAnswer}
-                  field="benefitDate"
-                />
-
-                <br/>
-
-                <Panel header={<span style={{ color: '#f44336' }}>FUTURE PAYMENT CLOSE</span>} collapsible bordered>
-                  <p>
-                  <QuestionPicker
-                    opts={this.state.benefitDates}
-                    value={this.state.benefitDate}
-                    text={(
-                      <span>
-                        That’s okay <Strong text={clientName}/>, we work with the same payment schedule as social security. So, let’s keep it simple. Your first payment won’t be until the day you receive your benefits, what day do you receive yours on, the 1st, 3rd, 2nd Wed, 3rd Wed or 4th Wed of the month?
-                      </span>
-                    )}
-                    onChange={this.updateStrAnswer}
-                    field="benefitDate"
-                  />
-                  <br/>
-                  <span>
-                    {'Ok great, so your first payment won’t be until your benefits have been deposited on '}
-                    <Strong text={currentBenefitDate} />
-                    {' And we’ll set up your future payments to always come out the exact same way. Our system coincides with Social Security. Isn’t that great?'}
-                  </span>
-                  </p>
-                </Panel> */}
-
-                
-                {/* <div ref={this.bankingRef}></div>
-                <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="BANKING"/>
-                <Annotation customStyles={{fontSize: '18px', margin:'12px 0px 36px 0'}} text="Talk Slow and Confident. Be sure to write everything down."/>
-
-                <p>
-                  Now, since our bank draft system is in tune with social security, this part is simple.
-                </p>
-
-                <div style={{ padding: '0px 36px 24px 36px' }}>
-                  <QuestionStr 
-                    text="What’s the name of your bank?"
-                    value={this.state.bankName}
-                    field="bankName"
-                    onChange={this.updateStrAnswer}
-                    />
-                  <QuestionBool
-                    text="Is this a checking or a savings account for you?"
-                    value={this.state.clientOwnsTheAccount}
-                    field="clientOwnsTheAccount"
-                    onChange={this.updateStrAnswer}
-                  />
-                </div> */}
-
-
-
-                {/* <Annotation customStyles={{fontSize: '20px', margin:'48px 0px 12px 0px'}} text="CHECKING ACCOUNT"/>
-                <Annotation customStyles={{fontSize: '18px', margin:'12px 0px 36px 0'}} text="(Check Google for Bank’s ROUTING #)"/>
-
-                <p>
-                  {'Ok, great I have some information that I need to verify with you. Please, grab your checkbook, take your time, just let me know when you’re ready. '}
-                  <span style={{color: '#f44336'}}>(Take your time)</span>
-                  {' I’m here for you.'}
-                </p>
-
-                <p>Please read me all the numbers at the bottom of a check starting from the left corner. </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr', columnGap: '12px', alignItems: 'center', padding: '0 24px'}}>
-                  <QuestionStr 
-                    text="Routing Number:"
-                    value={this.state.routingNumber}
-                    field="routingNumber"
-                    onChange={this.updateStrAnswer}
-                    />
-                  
-                  <Divider vertical />
-
-                  <QuestionStr 
-                    text="Account Number:"
-                    value={this.state.accountNumber}
-                    field="accountNumber"
-                    onChange={this.updateStrAnswer}
-                    />
-                </div>
-
-                <p>
-                  {'Sometimes on the phone, fives sound like nines and nines sound like fives... I just want to make sure I heard you right. So, please '}
-                  <span style={{ fontWeight: '500', fontSize: '24px', fontStyle: 'italic' }} >slowly</span>
-                  {' read me all the numbers one more time in order starting from the left and let me know if you see any spaces in between.'}
-                </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 24px 1fr', columnGap: '12px', alignItems: 'center', padding: '0 24px'}}>
-                  <QuestionStr 
-                    text="Routing Number:"
-                    value={this.state.routingNumber2}
-                    field="routingNumber2"
-                    onChange={this.updateStrAnswer}
-                    />
-                  
-                  <Divider vertical />
-
-                  <QuestionStr 
-                    text="Account Number:"
-                    value={this.state.accountNumber2}
-                    field="accountNumber2"
-                    onChange={this.updateStrAnswer}
-                    />
-                </div>
-
-                <br/>
-
-                <Panel header={<span style={{ color: '#f44336' }}>OBJECTIONS WITH BANKING</span>} collapsible bordered>
-                  <p>
-                    {'Don’t worry, we have a very secure system in place, your numbers are encrypted so I won’t be able to see your banking information, it gets covered up with X’s on my screen, go ahead, I’m ready whenever you are.'}
-                  </p>
-                </Panel> */}
 
                 <QuestionStr 
                     text="Copy and Paste Bettercheck Results:"
@@ -1203,88 +1002,8 @@ export default class Sheet extends React.Component {
                     />
                 
 
-
-                {/* <div ref={this.objectionsRef}></div>
-                <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Objections"/>
-
-                <Panel header={<span style={{ color: '#f44336' }}>Budget</span>} collapsible bordered>
-                  <p>
-                    <span style={{ fontWeight: 500 }}>"I completely understand."</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>Other than price, is there any other reason why you wouldn't move forwards today?</Timeline.Item>
-                      <Timeline.Item>Reliancera has more to offer than any of our competitors.</Timeline.Item>
-                      <Timeline.Item>What price range are you trying to stay within?</Timeline.Item>
-                    </Timeline>
-                  </p>
-                </Panel>
-
-
-                <Panel header={<span style={{ color: '#f44336' }}>Send Email</span>} collapsible bordered>
-                  <p>
-                    <span>No problem. What’s the best email address for you?</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>In addition to the pricing, what other information would be most helpful for you?</Timeline.Item>
-                    </Timeline>
-                  </p>
-                </Panel>
-
-                <Panel header={<span style={{ color: '#f44336' }}>Shopping Around</span>} collapsible bordered>
-                  <p>
-                    <span>"I understand why you’d want to consider multiple options."</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>Which other companies are you considering?</Timeline.Item>
-                      <Timeline.Item>Why don't we go ahead and fill out your application and see if we can get you qualified?</Timeline.Item>
-                      <Timeline.Item>You do not have to pay anything today.</Timeline.Item>
-                    </Timeline>
-                    <Divider/>
-                    <span>If customer insists on sending info:</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>Absolutely, no problem.</Timeline.Item>
-                      <Timeline.Item>How soon are you looking to get coverage?</Timeline.Item>
-                      <Timeline.Item>I can call you back on [day] or this [day].</Timeline.Item>
-                      <Timeline.Item>Thank you for your time, I will speak to you on [day] at [time]</Timeline.Item>
-                    </Timeline>
-                  </p>
-                </Panel>
-
-                <Panel header={<span style={{ color: '#f44336' }}>Not Interested</span>} collapsible bordered>
-                  <p>                 
-                    <span>That's OK, you aren't required to purchase anything today.</span><hr/>
-                    <span>This is just for information purposes.</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>Pivot back to the script</Timeline.Item>
-                    </Timeline>
-                  </p>
-                </Panel>
-
-                <Panel header={<span style={{ color: '#f44336' }}>Refusal to provide Social Security Number </span>} collapsible bordered>
-                  <p>                 
-                    <span>In order to verify you are who you say you are for official documents, what is your social?</span><hr/><br/>
-                    <span>If the customer continues to push back say:</span>
-                    <Timeline style={{ padding: '24px 0 0 24px' }}>
-                      <Timeline.Item>That's OK, go ahead.</Timeline.Item>
-                    </Timeline>
-                  </p>
-                </Panel> */}
-
-
-
-
-
                 <div ref={this.buttonsUpRef}></div>
-                <Annotation customStyles={{fontSize: '20px', margin:'48px 0'}} text="Button Up"/>
-        
-        
-                {/* <p>Awesome {<Strong text={clientName}/>} WE’RE GOOD, you should be getting a welcome packet in the mail in a few weeks.</p> */}
-                <p>{<Strong text={clientName}/>} how do you feel about the coverage you put in place today? (Wait for Response) </p>
-                <p>I just want to tell you, you’re awesome for protecting <Strong text={beneficiary}/>. </p>
-                {/* <p>I’m really curious {<Strong text={clientName}/>} what was the driving force behind your wise decision today? (Wait for Response) </p> */}
-                {/* <p>Wow, thank you for sharing that with me {<Strong text={clientName}/>}, we’re committed to making sure the money will be readily available for <Strong text={beneficiary}/>. </p> */}
-                <p>Likewise, I know you’re committed to making sure you have the funds available for your bank to make the monthly premiums. </p>
-                <p>In other words, you can count on us and we can count on you, isn’t that right, {<Strong text={clientName}/>}? </p>
-                <p>It’s my job to make sure you’re aware of every little detail, so real quick, I want you to be mindful that sometimes it can take a few days from your benefit date for your bank to make the premium payment for you, mostly when it falls on weekends or holidays., </p>
-                <p>So just be sure that there’s enough in there to cover your insurance payment so your policy won’t lapse, okay? </p>
-                <p>Great! </p>
+
               </Card>
         
               <br/>
@@ -1292,19 +1011,6 @@ export default class Sheet extends React.Component {
         
               <Card customRef={this.vipsRef}>
         
-                <Annotation text={'Asking for Referrals without Pushing or Begging - Using VIPS'}/>
-        
-                <Annotation text="Value"/>
-                <p>
-                  {'I’ve really enjoyed talking with you today. You’ve been so gracious answering all the questions I’ve had for you. I’m curious, what part of the process did you find most valuable? '}
-                  <span style={{color: '#f44336'}}>(wait for a response)</span>
-                </p>
-        
-                <Annotation text="Importance "/>
-                <p>
-                  {'That’s great, I know you see the value in the work I do. I’m glad you requested the information so I could serve you today. With that in mind, I have an important question to ask you? '}
-                  <span style={{color: '#f44336'}}>(wait for a response)</span>
-                </p>
                 <Annotation text="Permission to Brainstorm - "/>
                 <p>
                   {'I was hoping to get your permission to brainstorm for a moment, about who you know who might truly value the work I do. I have a few ideas to run by you. Would you be open to this for a moment. '}
@@ -1415,7 +1121,6 @@ export default class Sheet extends React.Component {
       routingNumber,
       routingNumber2,
       selectedCarrier,
-      selectedDiseases,
       selectedQuote,
       smoked: smoker,
       startCoverageAsSoonAsPossible,
@@ -1424,6 +1129,8 @@ export default class Sheet extends React.Component {
       weight,
       zip,
       agent,
+      ssn,
+      medicationsNotes
     } = this.state;
 
 
@@ -1480,6 +1187,8 @@ export default class Sheet extends React.Component {
       clientOwnsTheAccount,
       married,
       phone,
+      ssn,
+      medicationsNotes
     })
 
   }
